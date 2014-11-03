@@ -5,16 +5,21 @@ import java.util.List;
 
 public class Node {
 	
-	int value;
-	List<Integer> neighbors;
+	private int value;
+	private List<Integer> neighbors;
 	
 	public Node() {}
+	
+	public Node(int value, Integer... neighbors) {
+		setValue(value);
+		setNeighbors(neighbors);
+	}
 	
 	public void setValue(int value) {
 		this.value = value;
 	}
 	
-	public void setNeighbors(Integer... neighbors) {
+	public void setNeighbors(Integer[] neighbors) {
 		this.neighbors = new ArrayList<Integer>(Arrays.asList(neighbors));
 	}
 	
@@ -25,5 +30,8 @@ public class Node {
 	public boolean isNeighbor(int neighbor) {
 		return neighbors.contains(neighbor);
 	}
-
+	
+	public boolean isNeighbor(Node neighbor) {
+		return neighbors.contains(neighbor.getValue());
+	}
 }
