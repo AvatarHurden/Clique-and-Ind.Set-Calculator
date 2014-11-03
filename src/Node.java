@@ -34,4 +34,22 @@ public class Node {
 	public boolean isNeighbor(Node neighbor) {
 		return neighbors.contains(neighbor.getValue());
 	}
+	
+	public String toString(boolean printNeighbors) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(value);
+		
+		if (printNeighbors) {
+			builder.append(" (");
+			for (Integer i : neighbors) {
+				builder.append(i);
+			
+				if (neighbors.indexOf(i) != neighbors.size() - 1)
+					builder.append(", ");
+			}
+		builder.append(")");
+		}
+		
+		return builder.toString();
+	}
 }

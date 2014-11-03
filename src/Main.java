@@ -26,9 +26,9 @@ public class Main {
 		order.add(node4);
 		order.add(node5);
 		
-		System.out.println(graph.getSize());
-		System.out.println(graph.getIndependentSetSize(order));
-		System.out.println(graph.getSize());
+		System.out.println(graph.toString());
+		System.out.println(graph.getIndependentSet(order).toString());
+		System.out.println(graph.toString(false));
 	}
 	
 }

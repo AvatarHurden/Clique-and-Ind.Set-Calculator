@@ -16,19 +16,19 @@ public class Graph {
 	}
 	
 	/**
-	 * Descobre o tamanho do conjunto independente formado por esse grafo ao remover
+	 * Descobre o conjunto independente formado por esse grafo ao remover
 	 * os vizinhos dos nodos na ordem determinada pela lista passada como parâmetro.
 	 * 
 	 * @param order para remover os vizinhos
 	 * @return tamanho do C.I.
 	 */
-	public int getIndependentSetSize(List<Node> order) {
+	public Graph getIndependentSet(List<Node> order) {
 		Graph temp = new Graph(this);
 		
 		for (Node n : order)
 			temp.removeNeighbors(n);
 		
-		return temp.getSize();
+		return temp;
 	}
 	
 	public void addNode(Node node) {
@@ -48,6 +48,22 @@ public class Graph {
 	
 	public int getSize() {
 		return nodes.size();
+	}
+	
+	public String toString() {
+		return toString(true);
+	}
+	
+	public String toString(boolean neighbors) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		for (Node n : nodes) {
+			builder.append(n.toString(neighbors));
+			if (nodes.indexOf(n) != nodes.size() - 1)
+				builder.append(", ");
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 	
 }
