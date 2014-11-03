@@ -28,6 +28,7 @@ public class Main {
 		
 		System.out.println(graph.getSize());
 		System.out.println(graph.getIndependentSetSize(order));
+		System.out.println(graph.getSize());
 	}
 	
 }

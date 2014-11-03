@@ -12,7 +12,7 @@ public class Graph {
 	}
 	
 	public Graph(Graph graph) {
-		this.nodes = graph.nodes;
+		this.nodes = new ArrayList<Node>(graph.nodes);
 	}
 	
 	/**
