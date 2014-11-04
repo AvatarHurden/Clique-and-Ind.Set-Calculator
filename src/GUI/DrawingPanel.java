@@ -1,9 +1,7 @@
 package GUI;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,14 +16,21 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 
 	private boolean placeVertex = false;
 	private boolean placeEdge = false;
+	private boolean placingEdge = false;
 	
-	List<Point> nodes;
+	private List<NodeGUI> nodes;
+	private NodeGUI selected;
+	
+	private List<EdgeGUI> edges;
+	private EdgeGUI edge;
 	
 	public DrawingPanel() {
 		
-		nodes = new ArrayList<Point>();
+		nodes = new ArrayList<NodeGUI>();
+		edges = new ArrayList<EdgeGUI>();
+		setLayout(null);
 		
-		setPreferredSize(new Dimension(600, 400));
+		setPreferredSize(new Dimension(800, 600));
 		setBorder(new LineBorder(Color.BLACK));
 		setBackground(Color.white);
 		
@@ -52,27 +57,68 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		Point point = e.getPoint();
-		Graphics2D g = (Graphics2D) getGraphics();	
 		
-		for (Point p : nodes)
-			if (p.distance(point) < 40) {
-				g.setColor(Color.gray);
-				g.setStroke(new BasicStroke());
-				g.drawOval(p.x - 10, p.y - 10, 20, 20);
-			} else {
-				g.setColor(Color.white);
-				g.drawOval(p.x - 10, p.y - 10, 20, 20);
+		double distance = 35;
+		GraphElement closest = null;
+		
+		for (EdgeGUI edge : edges)
+			if (edge.distance(point) < distance / 2) {
+				edge.addAura();
+				distance = edge.distance(point);
+				closest = edge;
+			} else
+				edge.removeAura();
+		for (NodeGUI node : nodes)
+			if (node.distance(point) < distance) {
+				distance = node.distance(point);
+				closest = node;
 			}
+		
+		
+		if (selected != null)
+			selected.removeAura();
+		for (EdgeGUI edge : edges)
+			edge.paint();
+		for (NodeGUI node : nodes)
+			node.paint();
+		
+		if (closest != null && closest instanceof NodeGUI && closest.equals(selected)) {
+			selected = (NodeGUI) closest;
+			selected.addAura();
+		}
+		
+		if (closest instanceof NodeGUI)
+			selected = (NodeGUI) closest;
+		
+		if (placingEdge) {
+			edge.paintToPoint(point);
+		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (!placeVertex)
-			return;
-		
-		Graphics2D g = (Graphics2D) getGraphics();	
-		g.fillOval(e.getX() - 5, e.getY() - 5, 10, 10);
-		nodes.add(e.getPoint());
+		if (placeVertex) {
+			NodeGUI panel = new NodeGUI(nodes.size(), e.getX(), e.getY(), getGraphics());
+			add(panel);
+			panel.paint();
+			nodes.add(panel);
+		} else if (placeEdge) {
+			
+			if (selected == null)
+				return;
+			
+			if (!placingEdge) {
+				edge = new EdgeGUI(selected, getGraphics());
+				placingEdge = true;
+
+			} else {
+				placingEdge = false;
+				edge.setEnd(selected);
+				edges.add(edge);
+				edge.paint();
+			}
+			
+		}
 }
 
 	@Override
@@ -93,8 +139,6 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 }

@@ -83,7 +83,7 @@ public class GraphFrame extends JFrame implements ActionListener {
 			buttonState.put(edgeButton, false);
 			break;
 		case "edge":
-			isPressed = buttonState.get(vertexButton);
+			isPressed = buttonState.get(edgeButton);
 			
 			panel.setPlaceVertex(false);
 			panel.setPlaceEdge(!isPressed);

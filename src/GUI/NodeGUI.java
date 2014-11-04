@@ -1,80 +1,100 @@
 package GUI;
 
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
-public class NodeGUI implements java.awt.Shape {
+import javax.swing.JPanel;
+
+public class NodeGUI extends JPanel implements GraphElement {
 	
-	Point center;
+	public static final int RADIUS = 15;
+	public static final int AURA = 30;
 	
-	public NodeGUI(float x, float y) {
+	private Graphics g;
+	
+	private String value;
+	private int x, y;
+	
+	private boolean aura;
+	private boolean highlight;
+	
+	public NodeGUI(int value, int x, int y, Graphics g) {
+		this.value = String.valueOf(value);
+		this.x = x;
+		this.y = y;
+		this.g = g;
+		setBounds(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
+	}
+	
+	@Override
+	public void addHighlight() {
+		highlight = true;
+		paint();
+	}
+
+	@Override
+	public void removeHighlight() {
+		highlight = false;
+		g.setColor(Color.WHITE);
+		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
+		paint();
+	}
+
+	@Override
+	public void addAura() {
+		if (aura)
+			return;
 		
-		center = new Point((int) x,(int) y);
+		aura = true;
+		g.setColor(Color.DARK_GRAY);
+		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
+	}
+
+	@Override
+	public void removeAura() {
+		if (!aura)
+			return;
 		
+		aura = false;
+		g.setColor(Color.WHITE);
+		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}
-
+	
 	@Override
-	public boolean contains(Point2D p) {
-		if (p.distance(center) < 20.0)
-			return true;
+	public void paint() {
+		if (highlight) {
+			g.setColor(Color.BLUE);
+			g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
+		}
+		paint(g);
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		g.setColor(Color.BLACK);
+		g.fillOval(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
 		
-		return false;
+		g.setColor(Color.WHITE);
+		FontMetrics fm = getFontMetrics(getFont());
+        g.drawString(value, x - fm.stringWidth(value) / 2, y + (fm.getMaxAscent() - fm.getMaxDescent()) / 2);
 	}
-
+	
 	@Override
-	public boolean contains(Rectangle2D arg0) {
-		// TODO Auto-generated method stub
-		return false;
+	public double distance(Point p) {
+		return p.distance(new Point(x, y));
 	}
-
-	@Override
-	public boolean contains(double arg0, double arg1) {
-		// TODO Auto-generated method stub
-		return false;
+	
+	public String toString() {
+		return value;
 	}
-
-	@Override
-	public boolean contains(double arg0, double arg1, double arg2, double arg3) {
-		// TODO Auto-generated method stub
-		return false;
+	
+	public int getX() {
+		return x;
 	}
-
-	@Override
-	public Rectangle getBounds() {
-		return new Rectangle(center.y - 20, center.y + 20, center.x - 20, center.x + 20);
-	}
-
-	@Override
-	public Rectangle2D getBounds2D() {
-		// TODO Auto-generated method stub
-		return getBounds();
-	}
-
-	@Override
-	public java.awt.geom.PathIterator getPathIterator(AffineTransform arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public java.awt.geom.PathIterator getPathIterator(AffineTransform arg0,
-			double arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean intersects(Rectangle2D arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean intersects(double arg0, double arg1, double arg2, double arg3) {
-		// TODO Auto-generated method stub
-		return false;
+	
+	public int getY() {
+		return y;
 	}
 }
