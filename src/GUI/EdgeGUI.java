@@ -20,10 +20,12 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		this.g = g;
 		this.start = start;
 		start.addHighlight();
+		start.addEdge(this);
 	}
 	
 	public void setEnd(NodeGUI end) {
 		this.end = end;
+		end.addEdge(this);
 		start.removeHighlight();
 	}
 	
@@ -35,6 +37,19 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		g.setColor(Color.BLACK);
 		g.drawLine(start.getX(), start.getY(), p.x, p.y);
 		lastLocation = p;
+	}
+	
+	@Override
+	public void setSelected(boolean isSelected) {
+		if (isSelected) {
+			start.addAura();
+			end.addAura();
+			addAura();
+		} else {
+			start.removeAura();
+			end.removeAura();
+			removeAura();
+		}
 	}
 	
 	@Override
@@ -87,7 +102,22 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		int x = (int) Math.round((p.x - a * b + a * p.y) / (double) (1 + a * a)); 
 		int y = (int) Math.round(a * x + b);
 		
-		return p.distance(new Point(x, y));
+		// Não permite poições fora do segmento de reta
+		if (x > Math.max(start.getX(), end.getX()))
+			x = Math.max(start.getX(), end.getX());
+		if (x < Math.min(start.getX(), end.getX()))
+			x = Math.min(start.getX(), end.getX());
+		
+		if (y > Math.max(start.getY(), end.getY()))
+			y = Math.max(start.getY(), end.getY());
+		if (y < Math.min(start.getY(), end.getY()))
+			y = Math.min(start.getY(), end.getY());
+		
+		double distance = p.distance(new Point(x, y));
+		if (start.distance(p) < NodeGUI.AURA || Math.abs(end.distance(p) - distance) < 5)
+			return distance + 100;
+		else
+			return distance;
 	}
 
 	@Override
@@ -101,5 +131,4 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

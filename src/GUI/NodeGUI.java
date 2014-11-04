@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -20,12 +22,31 @@ public class NodeGUI extends JPanel implements GraphElement {
 	private boolean aura;
 	private boolean highlight;
 	
+	private List<EdgeGUI> edges;
+	
 	public NodeGUI(int value, int x, int y, Graphics g) {
 		this.value = String.valueOf(value);
 		this.x = x;
 		this.y = y;
 		this.g = g;
-		setBounds(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
+		
+		edges = new ArrayList<EdgeGUI>();
+	}
+	
+	public void addEdge(EdgeGUI edge) {
+		edges.add(edge);
+	}
+	
+	@Override
+	public void setSelected(boolean isSelected) {
+		if (isSelected) addAura();
+		else removeAura();
+		
+		for (EdgeGUI edge : edges)
+			if (isSelected)
+				edge.addAura();
+			else
+				edge.removeAura();
 	}
 	
 	@Override

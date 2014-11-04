@@ -5,6 +5,8 @@ import java.awt.Point;
 
 public interface GraphElement {
 	
+	public void setSelected(boolean isSelected);
+	
 	public void addHighlight();
 	
 	public void removeHighlight();
