@@ -51,6 +51,14 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	/**
+	 * Desativa elementos do grafo que não estejam em seu subgrafo, pintando o resultado
+	 */
+	public void enableSubGraph(Graph subGraph) {
+		graph.enableSubGraph(subGraph);
+		graph.drawGraph();
+	}
+	
+	/**
 	 * Define o estado do painel
 	 */
 	public void setState(DrawingState state) {
@@ -62,7 +70,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Também pinta o elemento "hovered" com a aura
 	 */
 	public void setHovered(Point point) {
-		GraphElement closest = graph.getClosest(point, true);
+		GraphElement closest = graph.getClosest(point, false);
 		
 		if (hoveredElement != closest)
 			graph.setHovered(hoveredElement, false);
@@ -119,7 +127,17 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		setHovered(e.getPoint());
+		if (state == DrawingState.DELETING) {		
+			GraphElement closest = graph.getClosest(e.getPoint(), true);
+		
+			if (hoveredElement != closest)
+				graph.setSelected(hoveredElement, false);
+		
+			hoveredElement = closest;
+			
+			graph.setSelected(hoveredElement, true);
+		} else
+			setHovered(e.getPoint());
 	}
 
 	// Um clique só é chamado quando o press e release ocorrem num período curto de tempo

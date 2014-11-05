@@ -11,6 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import main.Graph;
+import main.Node;
 import GUI.DrawingPanel.DrawingState;
 
 public class GraphFrame extends JFrame implements ActionListener {
@@ -22,7 +24,6 @@ public class GraphFrame extends JFrame implements ActionListener {
 	private HashMap<JButton, Boolean> buttonState;
 	
 	public GraphFrame() {
-		
 		buttonState = new HashMap<JButton, Boolean>();
 		
 		setComponents();
@@ -87,50 +88,43 @@ public class GraphFrame extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent ev) {
-		boolean isPressed;
+		JButton source = (JButton) ev.getSource();
+
+		// Verificamos se o botão estava clicado anteriormente
+		boolean isPressed = buttonState.get(source);
+		
+		// Desativamos todos os botões
+		for (Entry<JButton, Boolean> entry : buttonState.entrySet()) {
+			entry.setValue(false);
+			entry.getKey().getModel().setPressed(false);
+		}
+					
+		// Invertemos o estado do botão atual
+		source.getModel().setPressed(!isPressed);
+		buttonState.put(source, !isPressed);
 		
 		switch (ev.getActionCommand()) {
 		// Caso o botão clicado tenha sido o de criação
 		case "create":
-			// Verificamos se o botão estava clicado anteriormente
-			isPressed = buttonState.get(creatingButton);
 			
 			// Colocamos o painel de desenho para poder ou não criar, dependendo do estado
 			// anterior
 			drawingPanel.setState(isPressed ? DrawingState.NONE : DrawingState.CREATING);
 			
-			// Desativamos todos os botões
-			for (Entry<JButton, Boolean> entry : buttonState.entrySet()) {
-				entry.setValue(false);
-				entry.getKey().getModel().setPressed(false);
-			}
-			
-			// Invertemos o estado do botão atual
-			creatingButton.getModel().setPressed(!isPressed);
-			buttonState.put(creatingButton, !isPressed);
-			
 			break;
 		case "move":
-			isPressed = buttonState.get(movingButton);
-			
 			drawingPanel.setState(isPressed ? DrawingState.NONE : DrawingState.MOVING);
-			
-			// Desativamos todos os botões
-			for (Entry<JButton, Boolean> entry : buttonState.entrySet()) {
-				entry.setValue(false);
-				entry.getKey().getModel().setPressed(false);
-			}
-			
-			movingButton.getModel().setPressed(!isPressed);
-			buttonState.put(movingButton, !isPressed);
-		
+			break;
+		case "delete":
+			drawingPanel.setState(isPressed ? DrawingState.NONE : DrawingState.DELETING);
 			break;
 		default:
 			break;
 		}
 		
-		System.out.println(drawingPanel.getGraph().toString(true));
-		
+		Graph graph = drawingPanel.getGraph();
+		Graph sub = graph.getIndependentSet(graph.getNodes().toArray(new Node[]{}));
+//		drawingPanel.enableSubGraph(sub);
 	}
 	
 }

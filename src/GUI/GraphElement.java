@@ -10,6 +10,11 @@ import java.awt.Point;
 public interface GraphElement {
 	
 	/**
+	 * Se ativo, objeto tem cores normais. Caso contrário, fica cinza
+	 */
+	public void setEnabled(boolean isEnabled);
+	
+	/**
 	 * Método chamado quando o usuário está modificando o elemento, como criar uma aresta
 	 * em um nodo ou deslocar um nodo
 	 * @param isSelected

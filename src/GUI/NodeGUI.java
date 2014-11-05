@@ -19,6 +19,8 @@ public class NodeGUI implements GraphElement {
 	private String value;
 	private int x, y;
 	
+	private boolean isEnabled = true;
+	
 	public NodeGUI(int value, int x, int y, Graphics g) {
 		this.value = String.valueOf(value);
 		this.x = x;
@@ -29,28 +31,35 @@ public class NodeGUI implements GraphElement {
 	public int getValue() {
 		return Integer.valueOf(value);
 	}
+	
+	@Override
+	public void setEnabled(boolean isEnabled) {
+		this.isEnabled = isEnabled;
+	}
 
 	@Override
 	public void setSelected(boolean isSelected) {
-		setHovered(isSelected);
+		g.setColor(isSelected ? Color.RED : Color.WHITE);
+		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
+		paint();
 	}
 	
 	@Override
 	public void setHighlight(boolean hasHighlight) {
-		g.setColor(hasHighlight ? Color.BLUE : Color.WHITE);
+		g.setColor(hasHighlight ? (isEnabled? Color.BLUE : Color.LIGHT_GRAY) : Color.WHITE);
 		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
 		paint();
 	}
 
 	@Override
 	public void setHovered(boolean isHovered) {
-		g.setColor(isHovered ? Color.DARK_GRAY : Color.WHITE);
+		g.setColor(isHovered ? (isEnabled? Color.DARK_GRAY : Color.LIGHT_GRAY) : Color.WHITE);
 		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}
 
 	@Override
 	public void paint() {
-		g.setColor(Color.BLACK);
+		g.setColor(isEnabled ? Color.BLACK : Color.LIGHT_GRAY);
 		g.fillOval(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
 		
 		g.setColor(Color.WHITE);

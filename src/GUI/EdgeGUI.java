@@ -1,7 +1,9 @@
 package GUI;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 
 public class EdgeGUI implements GraphElement {
@@ -13,6 +15,8 @@ public class EdgeGUI implements GraphElement {
 	
 	// Última localização da aresta, para permitir atualização em tempo real da posição
 	private Point lastLocation;
+	
+	private boolean isEnabled = true;
 	
 	public EdgeGUI(NodeGUI start, Graphics g) {
 		this.g = g;
@@ -90,10 +94,17 @@ public class EdgeGUI implements GraphElement {
 	}
 	
 	@Override
+	public void setEnabled(boolean isEnabled) {
+		this.isEnabled = isEnabled;
+	}
+	
+	@Override
 	public void setSelected(boolean isSelected) {
-		start.setHovered(isSelected);
-		end.setHovered(isSelected);
-		setHovered(isSelected);
+		g.setColor(isSelected ? Color.RED : Color.WHITE);
+		((Graphics2D) g).setStroke(new BasicStroke(5));
+		g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+		((Graphics2D) g).setStroke(new BasicStroke(1));
+		paint();
 	}
 	
 	@Override
@@ -106,7 +117,7 @@ public class EdgeGUI implements GraphElement {
 
 	@Override
 	public void paint() {
-		g.setColor(Color.BLACK);
+		g.setColor(isEnabled ? Color.BLACK : Color.LIGHT_GRAY);
 		g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
 	}
 
@@ -157,4 +168,5 @@ public class EdgeGUI implements GraphElement {
 		return (start.equals(((EdgeGUI)edge).start) && end.equals(((EdgeGUI)edge).end)) || 
 				(start.equals(((EdgeGUI)edge).end) && end.equals(((EdgeGUI)edge).start));
 	}
+
 }

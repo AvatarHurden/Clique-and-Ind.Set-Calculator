@@ -18,6 +18,9 @@ public class Main {
 		Node node7 = new Node(7, 9);
 		Node node8 = new Node(8, 6, 9);
 		Node node9 = new Node(9, 1, 3, 4, 5, 7, 8);
+		Node node10 = new Node(10);
+		Node node11 = new Node(11, 1, 3, 4, 5, 7, 8);
+		Node node12 = new Node(12, 1, 3, 4, 5, 7, 8);
 		
 		Graph graph = new Graph();
 		graph.addNode(node1);
@@ -29,6 +32,7 @@ public class Main {
 		graph.addNode(node7);
 		graph.addNode(node8);
 		graph.addNode(node9);
+		graph.addNode(node10);
 		
 		List<Node> order = new ArrayList<Node>();
 		order.add(node1);
@@ -40,21 +44,24 @@ public class Main {
 		order.add(node7);
 		order.add(node8);
 		order.add(node9);
+		order.add(node10);
 		
 		Permutations per = new Permutations();
 		
-		ArrayList<Node[]> permutaions = (per.permutations(order.toArray(new Node[]{})));
+		System.out.println("Starting");
+		
+//		ArrayList<Node[]> permutaions = (per.permutations(order.toArray(new Node[]{})));
 		
 		System.out.println("Permuted");
 		
 		Graph largest = null;
-		for (Node[] array : permutaions) {
-			Graph temp = graph.getIndependentSet(array);
-			if (largest == null || largest.getSize() < temp.getSize())
-				largest = temp;
-		}
+//		for (Node[] array : permutaions) {
+//			Graph temp = graph.getIndependentSet(array);
+//			if (largest == null || largest.getSize() < temp.getSize())
+//				largest = temp;
+//		}
 		
-		System.out.println(largest.toString(false));
+//		System.out.println(largest.toString(false));
 		
 		new GraphFrame();
 	}

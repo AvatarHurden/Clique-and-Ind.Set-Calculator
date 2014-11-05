@@ -20,6 +20,16 @@ public class GraphGUI {
 		edges = new ArrayList<EdgeGUI>();
 	}
 	
+	public void enableSubGraph(Graph graph) {
+		for (NodeGUI node : nodes)
+			if (!graph.containsNode(node.getValue()))
+				node.setEnabled(false);
+		
+		for (EdgeGUI edge : edges)
+			if (!graph.hasConnection(edge.getStart().getValue(), edge.getEnd().getValue()))
+				edge.setEnabled(false);
+	}
+	
 	/**
 	 * Cria um novo GraphGUI, removendo elementos que não estejam no grafo passado como
 	 * parâmetro
@@ -42,7 +52,7 @@ public class GraphGUI {
 	 * Cria um novo Nodo na posição especificada
 	 */
 	public void createNode(Point point, Graphics g) {
-		NodeGUI node = new NodeGUI(value++, point.x, point.y, g);
+		NodeGUI node = new NodeGUI(++value, point.x, point.y, g);
 		nodes.add(node);
 	}
 	
@@ -90,6 +100,16 @@ public class GraphGUI {
 		// Caso o elemento seja uma aresta, pinta o grafo de novo para colocar os nodos no topo
 		if (elem instanceof EdgeGUI)
 			drawGraph();
+	}
+	
+	public void setSelected(GraphElement elem, boolean isSelected) {
+		if (elem != null)
+			elem.setSelected(isSelected);
+		if (elem instanceof NodeGUI)
+			for (EdgeGUI edge : edges)
+				if (edge.isEdgeOf((NodeGUI) elem))
+					edge.setSelected(isSelected);
+		drawGraph();
 	}
 	
 	/**
