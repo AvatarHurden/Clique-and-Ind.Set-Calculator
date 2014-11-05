@@ -3,6 +3,7 @@ package GUI;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import main.Graph;
@@ -51,9 +52,11 @@ public class GraphGUI {
 	/**
 	 * Cria um novo Nodo na posição especificada
 	 */
-	public void createNode(Point point, Graphics g) {
-		NodeGUI node = new NodeGUI(++value, point.x, point.y, g);
+	public NodeGUI createNode(Point point, Graphics g) {
+		NodeGUI node = new NodeGUI(point.x, point.y, g);
+		node.setValue(++value);
 		nodes.add(node);
+		return node;
 	}
 	
 	/**
@@ -110,6 +113,26 @@ public class GraphGUI {
 				if (edge.isEdgeOf((NodeGUI) elem))
 					edge.setSelected(isSelected);
 		drawGraph();
+	}
+	
+	public void delete(GraphElement elem) {
+		if (elem instanceof NodeGUI) {
+			Iterator<EdgeGUI> iter = edges.iterator();
+			EdgeGUI edge;
+			while (iter.hasNext())
+				if ((edge = iter.next()).isEdgeOf((NodeGUI) elem)) {
+					iter.remove();
+					edge.erase();
+				}
+		}
+		if (elem != null) {
+			elem.erase();
+			if (elem instanceof NodeGUI)
+				nodes.remove(elem);
+			else
+				edges.remove(elem);
+		}
+		//drawGraph();
 	}
 	
 	/**

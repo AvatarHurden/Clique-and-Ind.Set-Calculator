@@ -16,16 +16,19 @@ public class NodeGUI implements GraphElement {
 	private Graphics g;
 	
 	// O valor é uma String para facilitar o desenho na tela
-	private String value;
+	private String value = "";
 	private int x, y;
 	
 	private boolean isEnabled = true;
 	
-	public NodeGUI(int value, int x, int y, Graphics g) {
-		this.value = String.valueOf(value);
+	public NodeGUI(int x, int y, Graphics g) {
 		this.x = x;
 		this.y = y;
 		this.g = g;	
+	}
+	
+	public void setValue(int value) {
+		this.value = String.valueOf(value);
 	}
 	
 	public int getValue() {

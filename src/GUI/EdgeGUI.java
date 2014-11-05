@@ -57,6 +57,11 @@ public class EdgeGUI implements GraphElement {
 	 * Apaga o desenho da aresta, para quando ela estiver completa ou for cancelada
 	 */
 	public void erase() {
+		if (end != null) {
+			setHovered(false);
+			setHighlight(false);
+			setSelected(false);
+		}
 		g.setColor(Color.WHITE);
 		
 		// Caso não tenha fim, deleta a última linha feita
@@ -108,13 +113,11 @@ public class EdgeGUI implements GraphElement {
 	}
 	
 	@Override
-	public void setHovered(boolean isHovered) {
-		//TODO criar representação melhor disso
-		g.setColor(isHovered ? Color.DARK_GRAY : Color.WHITE);
-		g.drawLine(start.getX() + 5, start.getY() + 5, end.getX() + 5, end.getY() + 5);
-		g.drawLine(start.getX() - 5, start.getY() - 5, end.getX() - 5, end.getY() - 5);
-	}
+	public void setHovered(boolean isHovered) {}
 
+	@Override
+	public void setHighlight(boolean hasHighlight) {}
+	
 	@Override
 	public void paint() {
 		g.setColor(isEnabled ? Color.BLACK : Color.LIGHT_GRAY);
@@ -150,12 +153,6 @@ public class EdgeGUI implements GraphElement {
 			return distance;
 	}
 
-	@Override
-	public void setHighlight(boolean hasHighlight) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	/**
 	 * Uma aresta é considerada igual a outra se seus nodos são iguais, não importando
 	 * se são objetos diferentes.
