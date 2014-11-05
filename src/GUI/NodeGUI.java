@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import main.Node;
+
 public class NodeGUI extends JPanel implements GraphElement {
 	
 	public static final int RADIUS = 15;
@@ -30,6 +32,11 @@ public class NodeGUI extends JPanel implements GraphElement {
 		this.g = g;
 		
 		edges = new ArrayList<EdgeGUI>();
+	}
+	
+	public Node getNode() {
+		
+		return null;
 	}
 
 	public void addEdge(EdgeGUI edge) {

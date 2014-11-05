@@ -12,6 +12,8 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import main.Graph;
+
 public class DrawingPanel extends JPanel implements MouseMotionListener, MouseListener {
 
 	private boolean creating = false;
@@ -35,6 +37,11 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		
 		addMouseMotionListener(this);
 		addMouseListener(this);
+	}
+	
+	public Graph getGraph() {
+		
+		return null;
 	}
 	
 	public void setCreating(boolean set) {

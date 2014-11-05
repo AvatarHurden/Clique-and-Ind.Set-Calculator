@@ -1,3 +1,4 @@
+package main;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +23,7 @@ public class Graph {
 	 * @param order para remover os vizinhos
 	 * @return tamanho do C.I.
 	 */
-	public Graph getIndependentSet(List<Node> order) {
+	public Graph getIndependentSet(Node[] order) {
 		Graph temp = new Graph(this);
 		
 		for (Node n : order)
