@@ -53,11 +53,17 @@ public class EdgeGUI implements GraphElement {
 	 * Apaga o desenho da aresta, para quando ela estiver completa ou for cancelada
 	 */
 	public void erase() {
-		if (lastLocation != null) {
-			g.setColor(Color.WHITE);
+		g.setColor(Color.WHITE);
+		
+		// Caso não tenha fim, deleta a última linha feita
+		if (lastLocation != null)
 			g.drawLine(start.getX(), start.getY(), lastLocation.x, lastLocation.y);
-			lastLocation = null;
-		}
+		
+		// Caso tenha fim, deleta a linha completa
+		if (end != null) 
+			g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+	
+		lastLocation = null;
 		start.setHighlight(false);
 	}
 	
@@ -72,7 +78,7 @@ public class EdgeGUI implements GraphElement {
 	/**
 	 * Desenha a aresta, desde seu nodo de início até o ponto passado como parâmetro
 	 */
-	public void paintToPoint(Point p) {
+	public void moveToPoint(Point p) {
 		if (lastLocation != null) {
 			g.setColor(Color.WHITE);
 			g.drawLine(start.getX(), start.getY(), lastLocation.x, lastLocation.y);
@@ -85,15 +91,15 @@ public class EdgeGUI implements GraphElement {
 	
 	@Override
 	public void setSelected(boolean isSelected) {
-		start.setAura(isSelected);
-		end.setAura(isSelected);
-		setAura(isSelected);
+		start.setHovered(isSelected);
+		end.setHovered(isSelected);
+		setHovered(isSelected);
 	}
 	
 	@Override
-	public void setAura(boolean hasAura) {
+	public void setHovered(boolean isHovered) {
 		//TODO criar representação melhor disso
-		g.setColor(hasAura ? Color.DARK_GRAY : Color.WHITE);
+		g.setColor(isHovered ? Color.DARK_GRAY : Color.WHITE);
 		g.drawLine(start.getX() + 5, start.getY() + 5, end.getX() + 5, end.getY() + 5);
 		g.drawLine(start.getX() - 5, start.getY() - 5, end.getX() - 5, end.getY() - 5);
 	}
@@ -106,11 +112,12 @@ public class EdgeGUI implements GraphElement {
 
 	@Override
 	public double distance(Point p) {
-		// Essa fórmula é encontrada derivando a distância de um ponto a uma reta
-		double a, b;
-		a = (end.getY() - start.getY()) / (double) (end.getX() - start.getX());
-		b = end.getY() - a * end.getX();
+
+		// y = ax + b
+		double a = (end.getY() - start.getY()) / (double) (end.getX() - start.getX());
+		double b = end.getY() - a * end.getX();
 		
+		// Essa fórmula é encontrada derivando a distância de um ponto a uma reta
 		int x = (int) Math.round((p.x - a * b + a * p.y) / (double) (1 + a * a)); 
 		int y = (int) Math.round(a * x + b);
 		
@@ -126,7 +133,7 @@ public class EdgeGUI implements GraphElement {
 			y = Math.min(start.getY(), end.getY());
 		
 		double distance = p.distance(new Point(x, y));
-		if (start.distance(p) < NodeGUI.AURA || Math.abs(end.distance(p) - distance) < 5)
+		if (start.distance(p) < NodeGUI.AURA || end.distance(p) < NodeGUI.AURA)
 			return distance + 100;
 		else
 			return distance;

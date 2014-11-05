@@ -72,12 +72,24 @@ public class GraphGUI {
 			e.paint();
 	}
 	
+	public void moveToPoint(GraphElement elem, Point p) {
+		if (elem instanceof NodeGUI)
+			for (EdgeGUI edge : edges)
+				if (edge.isEdgeOf((NodeGUI) elem))
+					edge.erase();
+		
+		elem.moveToPoint(p);
+	}
+	
 	/**
 	 * Coloca (ou remove) a aura no elemento especificado
 	 */
-	public void setAura(GraphElement elem, boolean hasAura) {
+	public void setHovered(GraphElement elem, boolean isHovered) {
 		if (elem != null)
-			elem.setAura(hasAura);
+			elem.setHovered(isHovered);
+		// Caso o elemento seja uma aresta, pinta o grafo de novo para colocar os nodos no topo
+		if (elem instanceof EdgeGUI)
+			drawGraph();
 	}
 	
 	/**

@@ -27,6 +27,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	private GraphGUI graph;
 	
 	private GraphElement hoveredElement;
+	private NodeGUI selected;
 	private EdgeGUI edge;
 	
 	public DrawingPanel() {
@@ -61,10 +62,10 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Também pinta o elemento "hovered" com a aura
 	 */
 	public void setHovered(Point point) {
-		GraphElement closest = graph.getClosest(point, false);
+		GraphElement closest = graph.getClosest(point, true);
 		
 		if (hoveredElement != closest)
-			graph.setAura(hoveredElement, false);
+			graph.setHovered(hoveredElement, false);
 		
 		hoveredElement = closest;
 
@@ -76,7 +77,21 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 */
 	public void repaintComponents() {
 		graph.drawGraph();
-		graph.setAura(hoveredElement, true);
+		graph.setHovered(hoveredElement, true);
+	}
+	
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		switch (state) {
+		case CREATING:
+			dragCreate(e.getPoint());
+			break;
+		case MOVING:
+			dragMove(e.getPoint());
+			break;
+		default:
+			break;
+		}
 	}
 	
 	/**
@@ -85,9 +100,38 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 */
 	public void dragCreate(Point p) {
 		if (placingEdge) {
-			edge.paintToPoint(p);
+			graph.moveToPoint(edge, p);
 			setHovered(p);
+		}
+	}
+
+	/**
+	 * Método a ser chamado quando o mouse for arrastado no modo MOVING.
+	 * Se estiver uma aresta sendo criada, ela é reposicionada e repintada
+	 */
+	public void dragMove(Point p) {
+		if (selected != null) {
+			graph.moveToPoint(selected, p);
 			repaintComponents();
+		}
+	}
+
+	
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		setHovered(e.getPoint());
+	}
+
+	// Um clique só é chamado quando o press e release ocorrem num período curto de tempo
+	// e em locais próximos (eu acho)
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		switch (state) {
+		case CREATING:
+			clickCreate(e.getPoint());
+			break;
+		default:
+			break;
 		}
 	}
 	
@@ -100,6 +144,20 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		graph.createNode(p, getGraphics());
 		repaintComponents();
 	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		switch (state) {
+		case CREATING:
+			pressCreate();
+			break;
+		case MOVING:
+			pressMove();
+			break;
+		default:
+			break;
+		}
+	}
 	
 	/**
 	 * Método a ser chamado quando o mouse for pressionado no modo CREATING.
@@ -109,6 +167,29 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		if (hoveredElement instanceof NodeGUI) {
 			placingEdge = true;
 			edge = new EdgeGUI((NodeGUI) hoveredElement, getGraphics());
+		}
+	}
+	
+	/**
+	 * Método a ser chamado quando o mouse for pressionado no modo MOVING.
+	 * Se hoveredElement for um nodo, coloca-o como sendo o nodo a ser movido
+	 */
+	public void pressMove() {
+		if (hoveredElement instanceof NodeGUI)
+			selected = (NodeGUI) hoveredElement;
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		switch (state) {
+		case CREATING:
+			releaseCreate();
+			break;
+		case MOVING:
+			releaseMove();
+			break;
+		default:
+			break;
 		}
 	}
 	
@@ -133,55 +214,12 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		repaintComponents();	
 	}
 	
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		switch (state) {
-		case CREATING:
-			dragCreate(e.getPoint());
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		setHovered(e.getPoint());
-	}
-
-	// Um clique só é chamado quando o press e release ocorrem num período curto de tempo
-	// e em locais próximos (eu acho)
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		switch (state) {
-		case CREATING:
-			clickCreate(e.getPoint());
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		switch (state) {
-		case CREATING:
-			pressCreate();
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		switch (state) {
-		case CREATING:
-			releaseCreate();
-			break;
-		default:
-			break;
-		}
+	/**
+	 * Método a ser chamado quando o mouse for largado no modo MOVING.
+	 * Se um nodo estiver sendo movido, termina de movê-lo.
+	 */
+	public void releaseMove() {
+		selected = null;
 	}
 
 	@Override

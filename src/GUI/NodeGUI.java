@@ -32,7 +32,7 @@ public class NodeGUI implements GraphElement {
 
 	@Override
 	public void setSelected(boolean isSelected) {
-		setAura(isSelected);
+		setHovered(isSelected);
 	}
 	
 	@Override
@@ -43,8 +43,8 @@ public class NodeGUI implements GraphElement {
 	}
 
 	@Override
-	public void setAura(boolean hasAura) {
-		g.setColor(hasAura ? Color.DARK_GRAY : Color.WHITE);
+	public void setHovered(boolean isHovered) {
+		g.setColor(isHovered ? Color.DARK_GRAY : Color.WHITE);
 		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}
 
@@ -58,6 +58,13 @@ public class NodeGUI implements GraphElement {
         g.drawString(value, x - fm.stringWidth(value) / 2, y + (fm.getMaxAscent() - fm.getMaxDescent()) / 2);
 	}
 	
+	@Override
+	public void erase() {
+		setHovered(false);
+		setHighlight(false);
+		g.setColor(Color.WHITE);
+		g.fillOval(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
+	}
 	
 	@Override
 	public double distance(Point p) {
@@ -74,5 +81,12 @@ public class NodeGUI implements GraphElement {
 	
 	public int getY() {
 		return y;
+	}
+	
+	public void moveToPoint(Point p) {
+		erase();
+		x = p.x;
+		y = p.y;
+		paint();
 	}
 }

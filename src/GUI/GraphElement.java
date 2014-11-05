@@ -26,12 +26,22 @@ public interface GraphElement {
 	 * Método chamado quando o usuário "hover" sobre o elemento no estado de criação
 	 * @param hasAura
 	 */
-	public void setAura(boolean hasAura);
+	public void setHovered(boolean isHovered);
 	
 	/**
 	 * Pinta o elemento na tela, no estado padrão
 	 */
 	public void paint();
+	
+	/**
+	 * Move o elemento até o ponto dado, eliminando a pintura anterior e pintando no novo local
+	 */
+	public void moveToPoint(Point point);
+	
+	/**
+	 * Remove a pintura do elemento na tela
+	 */
+	public void erase();
 	
 	/**
 	 * Calcula a distância do elemento até o ponto

@@ -113,6 +113,8 @@ public class GraphFrame extends JFrame implements ActionListener {
 		case "move":
 			isPressed = buttonState.get(movingButton);
 			
+			drawingPanel.setState(isPressed ? DrawingState.NONE : DrawingState.MOVING);
+			
 			// Desativamos todos os botões
 			for (Entry<JButton, Boolean> entry : buttonState.entrySet()) {
 				entry.setValue(false);
@@ -125,7 +127,10 @@ public class GraphFrame extends JFrame implements ActionListener {
 			break;
 		default:
 			break;
-		}	
+		}
+		
+		System.out.println(drawingPanel.getGraph().toString(true));
+		
 	}
 	
 }
