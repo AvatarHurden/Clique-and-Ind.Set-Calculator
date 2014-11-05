@@ -6,8 +6,6 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
@@ -16,20 +14,22 @@ import main.Graph;
 
 public class DrawingPanel extends JPanel implements MouseMotionListener, MouseListener {
 
-	private boolean creating = false;
+	/**
+	 * Estados possíveis do painel
+	 */
+	public enum DrawingState {
+		CREATING, MOVING, DELETING, NONE;
+	}
+	
+	private DrawingState state = DrawingState.NONE;
 	private boolean placingEdge = false;
 	
-	private List<NodeGUI> nodes;
-	private GraphElement selected;
+	private GraphGUI graph;
 	
-	private List<EdgeGUI> edges;
+	private GraphElement hoveredElement;
 	private EdgeGUI edge;
 	
 	public DrawingPanel() {
-		
-		nodes = new ArrayList<NodeGUI>();
-		edges = new ArrayList<EdgeGUI>();
-		setLayout(null);
 		
 		setPreferredSize(new Dimension(800, 600));
 		setBorder(new LineBorder(Color.BLACK));
@@ -37,129 +37,157 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		
 		addMouseMotionListener(this);
 		addMouseListener(this);
+
+		graph = new GraphGUI();
 	}
 	
 	public Graph getGraph() {
-		
-		return null;
+		return graph.toGraph();
 	}
 	
-	public void setCreating(boolean set) {
-		creating = set;
+	public void setGraph(GraphGUI graph) {
+		this.graph = graph;
 	}
 	
-	public void setProximity(Point mouse) {
-		double distance = 35;
-		GraphElement closest = null;
+	/**
+	 * Define o estado do painel
+	 */
+	public void setState(DrawingState state) {
+		this.state = state;
+	}
+	
+	/**
+	 * Define o elemento a ser "hovered", dada a posição do mouse.
+	 * Também pinta o elemento "hovered" com a aura
+	 */
+	public void setHovered(Point point) {
+		GraphElement closest = graph.getClosest(point, false);
 		
-		for (NodeGUI node : nodes)
-			if (node.distance(mouse) < distance) {
-				distance = node.distance(mouse);
-				closest = node;
-			}
+		if (hoveredElement != closest)
+			graph.setAura(hoveredElement, false);
 		
-		if (selected != null && selected != closest)
-			selected.removeAura();
-		
-		selected = closest;
+		hoveredElement = closest;
 
-		if (placingEdge)
-			edge.paintToPoint(mouse);
-		
 		repaintComponents();
 	}
 	
+	/**
+	 * Pinta todos os elementos na tela, colocando ênfase nos adequados
+	 */
 	public void repaintComponents() {
-		for (GraphElement e : edges)
-			e.paint();
-		for (GraphElement e : nodes) 
-			e.paint();
-		
-		if (selected != null)
-			selected.addAura();
+		graph.drawGraph();
+		graph.setAura(hoveredElement, true);
 	}
 	
+	/**
+	 * Método a ser chamado quando o mouse for arrastado no modo CREATING.
+	 * Se estiver uma aresta sendo criada, ela é reposicionada e repintada
+	 */
 	public void dragCreate(Point p) {
 		if (placingEdge) {
 			edge.paintToPoint(p);
-			setProximity(p);
+			setHovered(p);
 			repaintComponents();
 		}
 	}
 	
+	/**
+	 * Método a ser chamado quando o mouse for clicado no modo CREATING.
+	 * Cria um novo nodo e adiciona-o no grafo
+	 * @param p
+	 */
 	public void clickCreate(Point p) {
-		NodeGUI node = new NodeGUI(nodes.size(), p.x, p.y, getGraphics());
-		nodes.add(node);
+		graph.createNode(p, getGraphics());
 		repaintComponents();
 	}
 	
+	/**
+	 * Método a ser chamado quando o mouse for pressionado no modo CREATING.
+	 * Se hoveredElement for um nodo, começa a criação de uma aresta no nodo
+	 */
 	public void pressCreate() {
-		if (selected != null && selected instanceof NodeGUI) {
+		if (hoveredElement instanceof NodeGUI) {
 			placingEdge = true;
-			edge = new EdgeGUI((NodeGUI) selected, getGraphics());
+			edge = new EdgeGUI((NodeGUI) hoveredElement, getGraphics());
 		}
 	}
 	
+	/**
+	 * Método a ser chamado quando o mouse for largado no modo CREATING.
+	 * Se hoveredElement for um nodo e uma aresta estiver sendo criada, termina a criação
+	 * e adiciona no grafo.
+	 */
 	public void releaseCreate() {
 		if (!placingEdge)
 			return;
 		
 		placingEdge = false;
 		
-		if (selected != null && edge != null && selected instanceof NodeGUI) {
-			edge.setEnd((NodeGUI) selected);
-			if (!edges.contains(edge))
-				edges.add(edge);
-			System.out.println(edges.size());
+		// Finaliza a criação apenas se o hoveredElement for um nodo diferente do início da aresta
+		if (hoveredElement instanceof NodeGUI && !edge.isEdgeOf((NodeGUI) hoveredElement)) {
+			edge.setEnd((NodeGUI) hoveredElement);
+			graph.addEdge(edge);
 		}
 		
 		edge.erase();
-		edge = null;
 		repaintComponents();	
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (creating)
+		switch (state) {
+		case CREATING:
 			dragCreate(e.getPoint());
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		setProximity(e.getPoint());
+		setHovered(e.getPoint());
 	}
 
+	// Um clique só é chamado quando o press e release ocorrem num período curto de tempo
+	// e em locais próximos (eu acho)
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (creating)
+		switch (state) {
+		case CREATING:
 			clickCreate(e.getPoint());
-		
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (creating)
+		switch (state) {
+		case CREATING:
 			pressCreate();
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		if (creating)
+		switch (state) {
+		case CREATING:
 			releaseCreate();
-
-		
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseEntered(MouseEvent arg0) {}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseExited(MouseEvent arg0) {}
 
 }

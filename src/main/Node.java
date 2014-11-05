@@ -21,6 +21,7 @@ public class Node {
 	}
 	
 	public void setNeighbors(Integer[] neighbors) {
+		// Transforma o array em List
 		this.neighbors = new ArrayList<Integer>(Arrays.asList(neighbors));
 	}
 	
@@ -28,15 +29,26 @@ public class Node {
 		return value;
 	}
 	
+	/**
+	 * Retorna se um nodo é vizinho deste, dado seu valor
+	 */
 	public boolean isNeighbor(int neighbor) {
 		return neighbors.contains(neighbor);
 	}
 	
 	public boolean isNeighbor(Node neighbor) {
-		return neighbors.contains(neighbor.getValue());
+		return isNeighbor(neighbor.getValue());
 	}
 	
+	/**
+	 * Constroi uma representação em String do Nodo, formada pelo seu valor e,
+	 * possivelmente, seus vizinhos.
+	 * 
+	 * @param printNeighbors - Se os vizinhos devem ser impresos
+	 */
 	public String toString(boolean printNeighbors) {
+		// String builder facilita a criação de strings, permitindo colocar novos trechos no
+		// final
 		StringBuilder builder = new StringBuilder();
 		builder.append(value);
 		
@@ -44,11 +56,11 @@ public class Node {
 			builder.append(" (");
 			for (Integer i : neighbors) {
 				builder.append(i);
-			
+				// Não coloca vírgula depois do último vizinho
 				if (neighbors.indexOf(i) != neighbors.size() - 1)
 					builder.append(", ");
 			}
-		builder.append(")");
+			builder.append(")");
 		}
 		
 		return builder.toString();

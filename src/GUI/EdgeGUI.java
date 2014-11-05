@@ -4,38 +4,74 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import javax.swing.JPanel;
-
-public class EdgeGUI extends JPanel implements GraphElement {
+public class EdgeGUI implements GraphElement {
 	
+	// Graphics é como objetos são desenhados na tela
 	private Graphics g;
+	// Nodo de começo e fim da aresta (são equivalentes, mas precisam de nomes diferentes)
 	private NodeGUI start, end;
-	private boolean aura;
 	
+	// Última localização da aresta, para permitir atualização em tempo real da posição
 	private Point lastLocation;
 	
 	public EdgeGUI(NodeGUI start, Graphics g) {
 		this.g = g;
 		this.start = start;
-		start.addHighlight();
-		start.addEdge(this);
+		start.setHighlight(true);
 	}
 	
+	/**
+	 * Verifica se a aresta pertence ao nodo pedido	
+	 */
+	public boolean isEdgeOf(NodeGUI node) {
+		return start.equals(node) || (end != null && end.equals(node));
+ 	}
+	
+	/**
+	 * Dado um nodo, retorna o seu par caso a aresta pertença ao nodo. Caso contrário,
+	 * retorna null 
+	 */
+	public NodeGUI getNeihgbor(NodeGUI node) {
+		if (!isEdgeOf(node))
+			return null;
+		
+		if (start.equals(node))
+			return end;
+		else
+			return start;
+	}
+	
+	public NodeGUI getStart() {
+		return start;
+	}
+	
+	public NodeGUI getEnd() {
+		return end;
+	}
+	
+	/**
+	 * Apaga o desenho da aresta, para quando ela estiver completa ou for cancelada
+	 */
 	public void erase() {
 		if (lastLocation != null) {
 			g.setColor(Color.WHITE);
 			g.drawLine(start.getX(), start.getY(), lastLocation.x, lastLocation.y);
 			lastLocation = null;
 		}
-		start.removeHighlight();
+		start.setHighlight(false);
 	}
 	
+	/**
+	 * "Completa" a aresta
+	 */
 	public void setEnd(NodeGUI end) {
 		this.end = end;
-		end.addEdge(this);
-		start.removeHighlight();
+		erase();
 	}
 	
+	/**
+	 * Desenha a aresta, desde seu nodo de início até o ponto passado como parâmetro
+	 */
 	public void paintToPoint(Point p) {
 		if (lastLocation != null) {
 			g.setColor(Color.WHITE);
@@ -43,63 +79,34 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		}
 		g.setColor(Color.BLACK);
 		g.drawLine(start.getX(), start.getY(), p.x, p.y);
+		start.setHighlight(true);
 		lastLocation = p;
 	}
 	
 	@Override
 	public void setSelected(boolean isSelected) {
-		if (isSelected) {
-			start.addAura();
-			end.addAura();
-			addAura();
-		} else {
-			start.removeAura();
-			end.removeAura();
-			removeAura();
-		}
+		start.setAura(isSelected);
+		end.setAura(isSelected);
+		setAura(isSelected);
 	}
 	
 	@Override
-	public void addAura() {
-		if (aura)
-			return;
-		
-		aura = true;
-		g.setColor(Color.DARK_GRAY);
-		g.drawLine(start.getX() + 5, start.getY() + 5, end.getX() + 5, end.getY() + 5);
-		g.drawLine(start.getX() - 5, start.getY() - 5, end.getX() - 5, end.getY() - 5);
-	}
-
-	@Override
-	public void removeAura() {
-		if (!aura)
-			return;
-		
-		aura = false;
-		g.setColor(Color.WHITE);
+	public void setAura(boolean hasAura) {
+		//TODO criar representação melhor disso
+		g.setColor(hasAura ? Color.DARK_GRAY : Color.WHITE);
 		g.drawLine(start.getX() + 5, start.getY() + 5, end.getX() + 5, end.getY() + 5);
 		g.drawLine(start.getX() - 5, start.getY() - 5, end.getX() - 5, end.getY() - 5);
 	}
 
 	@Override
 	public void paint() {
-		paint(g);
-	}
-	
-	@Override
-	public void paint(Graphics g) {
-		if (lastLocation != null) {
-			g.setColor(Color.WHITE);
-			g.drawLine(start.getX(), start.getY(), lastLocation.x, lastLocation.y);
-			lastLocation = null;
-		}
-		
 		g.setColor(Color.BLACK);
 		g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
 	}
 
 	@Override
 	public double distance(Point p) {
+		// Essa fórmula é encontrada derivando a distância de um ponto a uma reta
 		double a, b;
 		a = (end.getY() - start.getY()) / (double) (end.getX() - start.getX());
 		b = end.getY() - a * end.getX();
@@ -126,17 +133,15 @@ public class EdgeGUI extends JPanel implements GraphElement {
 	}
 
 	@Override
-	public void addHighlight() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeHighlight() {
+	public void setHighlight(boolean hasHighlight) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Uma aresta é considerada igual a outra se seus nodos são iguais, não importando
+	 * se são objetos diferentes.
+	 */
 	@Override
 	public boolean equals(Object edge) {
 		if (!(edge instanceof EdgeGUI))

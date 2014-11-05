@@ -4,101 +4,60 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JPanel;
+import javax.swing.JLabel;
 
-import main.Node;
-
-public class NodeGUI extends JPanel implements GraphElement {
+public class NodeGUI implements GraphElement {
 	
+	// tamanho do raio do Nodo e da aura do nodo
 	public static final int RADIUS = 15;
 	public static final int AURA = 30;
 	
 	private Graphics g;
 	
+	// O valor é uma String para facilitar o desenho na tela
 	private String value;
 	private int x, y;
-	
-	private boolean highlight;
-	
-	private List<EdgeGUI> edges;
 	
 	public NodeGUI(int value, int x, int y, Graphics g) {
 		this.value = String.valueOf(value);
 		this.x = x;
 		this.y = y;
-		this.g = g;
-		
-		edges = new ArrayList<EdgeGUI>();
+		this.g = g;	
 	}
 	
-	public Node getNode() {
-		
-		return null;
+	public int getValue() {
+		return Integer.valueOf(value);
 	}
 
-	public void addEdge(EdgeGUI edge) {
-		edges.add(edge);
-	}
-	
 	@Override
 	public void setSelected(boolean isSelected) {
-		if (isSelected) addAura();
-		else removeAura();
-		
-		for (EdgeGUI edge : edges)
-			if (isSelected)
-				edge.addAura();
-			else
-				edge.removeAura();
+		setAura(isSelected);
 	}
 	
 	@Override
-	public void addHighlight() {
-		highlight = true;
-		paint();
-	}
-
-	@Override
-	public void removeHighlight() {
-		highlight = false;
-		g.setColor(Color.WHITE);
+	public void setHighlight(boolean hasHighlight) {
+		g.setColor(hasHighlight ? Color.BLUE : Color.WHITE);
 		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
 		paint();
 	}
 
 	@Override
-	public void addAura() {
-		g.setColor(Color.DARK_GRAY);
+	public void setAura(boolean hasAura) {
+		g.setColor(hasAura ? Color.DARK_GRAY : Color.WHITE);
 		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}
 
 	@Override
-	public void removeAura() {
-		g.setColor(Color.WHITE);
-		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
-	}
-	
-	@Override
 	public void paint() {
-		if (highlight) {
-			g.setColor(Color.BLUE);
-			g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
-		}
-		paint(g);
-	}
-	
-	@Override
-	public void paint(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillOval(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
 		
 		g.setColor(Color.WHITE);
-		FontMetrics fm = getFontMetrics(getFont());
+		FontMetrics fm = new JLabel().getFontMetrics(new JLabel().getFont());
         g.drawString(value, x - fm.stringWidth(value) / 2, y + (fm.getMaxAscent() - fm.getMaxDescent()) / 2);
 	}
+	
 	
 	@Override
 	public double distance(Point p) {
