@@ -29,6 +29,10 @@ public class Node {
 		return value;
 	}
 	
+	public List<Integer> getNeighbors() {
+		return neighbors;
+	}
+	
 	/**
 	 * Retorna se um nodo é vizinho deste, dado seu valor
 	 */
