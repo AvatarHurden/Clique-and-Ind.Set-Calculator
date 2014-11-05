@@ -19,7 +19,6 @@ public class NodeGUI extends JPanel implements GraphElement {
 	private String value;
 	private int x, y;
 	
-	private boolean aura;
 	private boolean highlight;
 	
 	private List<EdgeGUI> edges;
@@ -32,7 +31,7 @@ public class NodeGUI extends JPanel implements GraphElement {
 		
 		edges = new ArrayList<EdgeGUI>();
 	}
-	
+
 	public void addEdge(EdgeGUI edge) {
 		edges.add(edge);
 	}
@@ -65,20 +64,12 @@ public class NodeGUI extends JPanel implements GraphElement {
 
 	@Override
 	public void addAura() {
-		if (aura)
-			return;
-		
-		aura = true;
 		g.setColor(Color.DARK_GRAY);
 		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}
 
 	@Override
 	public void removeAura() {
-		if (!aura)
-			return;
-		
-		aura = false;
 		g.setColor(Color.WHITE);
 		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}

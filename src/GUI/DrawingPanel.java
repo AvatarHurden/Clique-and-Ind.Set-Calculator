@@ -12,10 +12,9 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-public class DrawingPanel extends JPanel implements MouseMotionListener, MouseListener{
+public class DrawingPanel extends JPanel implements MouseMotionListener, MouseListener {
 
-	private boolean placeVertex = false;
-	private boolean placeEdge = false;
+	private boolean creating = false;
 	private boolean placingEdge = false;
 	
 	private List<NodeGUI> nodes;
@@ -38,92 +37,111 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		addMouseListener(this);
 	}
 	
-	public void setPlaceVertex(boolean set) {
-		placeVertex = set;
-	}
-
-	public void setPlaceEdge(boolean set) {
-		placeEdge = set;
+	public void setCreating(boolean set) {
+		creating = set;
 	}
 	
 	public void setProximity(Point mouse) {
 		double distance = 35;
 		GraphElement closest = null;
 		
-		for (EdgeGUI edge : edges)
-			if (edge.distance(mouse) < distance) {
-				distance = edge.distance(mouse);
-				closest = edge;
-			}
 		for (NodeGUI node : nodes)
 			if (node.distance(mouse) < distance) {
 				distance = node.distance(mouse);
 				closest = node;
 			}
-				
-		selected = closest;
 		
-		repaintComponents();
+		if (selected != null && selected != closest)
+			selected.removeAura();
+		
+		selected = closest;
 
 		if (placingEdge)
 			edge.paintToPoint(mouse);
+		
+		repaintComponents();
 	}
 	
 	public void repaintComponents() {
-		for (GraphElement e : edges) {
-			e.removeAura();
-			e.removeHighlight();
+		for (GraphElement e : edges)
 			e.paint();
-		}
-		for (GraphElement e : nodes) {
-			e.removeAura();
-			e.removeHighlight();
+		for (GraphElement e : nodes) 
 			e.paint();
-		}
 		
 		if (selected != null)
 			selected.addAura();
 	}
 	
+	public void dragCreate(Point p) {
+		if (placingEdge) {
+			edge.paintToPoint(p);
+			setProximity(p);
+			repaintComponents();
+		}
+	}
+	
+	public void clickCreate(Point p) {
+		NodeGUI node = new NodeGUI(nodes.size(), p.x, p.y, getGraphics());
+		nodes.add(node);
+		repaintComponents();
+	}
+	
+	public void pressCreate() {
+		if (selected != null && selected instanceof NodeGUI) {
+			placingEdge = true;
+			edge = new EdgeGUI((NodeGUI) selected, getGraphics());
+		}
+	}
+	
+	public void releaseCreate() {
+		if (!placingEdge)
+			return;
+		
+		placingEdge = false;
+		
+		if (selected != null && edge != null && selected instanceof NodeGUI) {
+			edge.setEnd((NodeGUI) selected);
+			if (!edges.contains(edge))
+				edges.add(edge);
+			System.out.println(edges.size());
+		}
+		
+		edge.erase();
+		edge = null;
+		repaintComponents();	
+	}
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (!placeEdge)
-			return;
+		if (creating)
+			dragCreate(e.getPoint());
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		Point point = e.getPoint();
-		
-		setProximity(point);
-
+		setProximity(e.getPoint());
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (placeVertex) {
-			
-			NodeGUI node = new NodeGUI(nodes.size(), e.getX(), e.getY(), getGraphics());
-			nodes.add(node);
-			repaintComponents();
-			
-		} else if (placeEdge) {
-			
-			if (selected == null || !(selected instanceof NodeGUI))
-				return;
-			
-			if (!placingEdge) {
-				edge = new EdgeGUI((NodeGUI) selected, getGraphics());
-				placingEdge = true;
-			} else {
-				placingEdge = false;
-				edge.setEnd((NodeGUI) selected);
-				edges.add(edge);
-				repaintComponents();
-			}
-			
-		}
-}
+		if (creating)
+			clickCreate(e.getPoint());
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (creating)
+			pressCreate();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		if (creating)
+			releaseCreate();
+
+		
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
@@ -137,12 +155,4 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		
 	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-	}
-	
 }

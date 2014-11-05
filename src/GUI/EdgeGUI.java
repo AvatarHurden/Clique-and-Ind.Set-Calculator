@@ -1,9 +1,7 @@
 package GUI;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 
 import javax.swing.JPanel;
@@ -21,6 +19,15 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		this.start = start;
 		start.addHighlight();
 		start.addEdge(this);
+	}
+	
+	public void erase() {
+		if (lastLocation != null) {
+			g.setColor(Color.WHITE);
+			g.drawLine(start.getX(), start.getY(), lastLocation.x, lastLocation.y);
+			lastLocation = null;
+		}
+		start.removeHighlight();
 	}
 	
 	public void setEnd(NodeGUI end) {
@@ -58,9 +65,9 @@ public class EdgeGUI extends JPanel implements GraphElement {
 			return;
 		
 		aura = true;
-		g.setColor(Color.BLUE);
-		((Graphics2D) g).setStroke(new BasicStroke(5));
-		g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+		g.setColor(Color.DARK_GRAY);
+		g.drawLine(start.getX() + 5, start.getY() + 5, end.getX() + 5, end.getY() + 5);
+		g.drawLine(start.getX() - 5, start.getY() - 5, end.getX() - 5, end.getY() - 5);
 	}
 
 	@Override
@@ -70,10 +77,8 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		
 		aura = false;
 		g.setColor(Color.WHITE);
-		((Graphics2D) g).setStroke(new BasicStroke(5));
-		g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
-		((Graphics2D) g).setStroke(new BasicStroke(1));
-		paint();
+		g.drawLine(start.getX() + 5, start.getY() + 5, end.getX() + 5, end.getY() + 5);
+		g.drawLine(start.getX() - 5, start.getY() - 5, end.getX() - 5, end.getY() - 5);
 	}
 
 	@Override
@@ -130,5 +135,14 @@ public class EdgeGUI extends JPanel implements GraphElement {
 	public void removeHighlight() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public boolean equals(Object edge) {
+		if (!(edge instanceof EdgeGUI))
+			return false;
+		
+		return (start.equals(((EdgeGUI)edge).start) && end.equals(((EdgeGUI)edge).end)) || 
+				(start.equals(((EdgeGUI)edge).end) && end.equals(((EdgeGUI)edge).start));
 	}
 }

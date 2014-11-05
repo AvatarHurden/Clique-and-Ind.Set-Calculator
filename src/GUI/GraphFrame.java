@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 public class GraphFrame extends JFrame implements ActionListener {
 
 	private DrawingPanel panel;
-	private JButton vertexButton, edgeButton;
+	private JButton creatingButton, movingButton, deletingButton;
 	private HashMap<JButton, Boolean> buttonState;
 	
 	public GraphFrame() {
@@ -48,19 +48,26 @@ public class GraphFrame extends JFrame implements ActionListener {
 	private JPanel makeButtonPanel() {
 		JPanel panel = new JPanel();
 		
-		vertexButton = new JButton("Novo Vértice");
-		vertexButton.addActionListener(this);
-		vertexButton.setActionCommand("vertex");
-		panel.add(vertexButton);
+		creatingButton = new JButton("Criar Componentes");
+		creatingButton.addActionListener(this);
+		creatingButton.setActionCommand("create");
+		panel.add(creatingButton);
 		
-		buttonState.put(vertexButton, false);
+		buttonState.put(creatingButton, false);
 		
-		edgeButton = new JButton("Nova Aresta");
-		edgeButton.addActionListener(this);
-		edgeButton.setActionCommand("edge");
-		panel.add(edgeButton);
+		movingButton = new JButton("Mover Componentes");
+		movingButton.addActionListener(this);
+		movingButton.setActionCommand("move");
+		panel.add(movingButton);
 		
-		buttonState.put(edgeButton, false);
+		buttonState.put(movingButton, false);
+		
+		deletingButton = new JButton("Deletar Componentes");
+		deletingButton.addActionListener(this);
+		deletingButton.setActionCommand("delete");
+		panel.add(deletingButton);
+		
+		buttonState.put(deletingButton, false);
 		
 		return panel;
 	}
@@ -70,29 +77,25 @@ public class GraphFrame extends JFrame implements ActionListener {
 		boolean isPressed;
 		
 		switch (ev.getActionCommand()) {
-		case "vertex":
-			isPressed = buttonState.get(vertexButton);
+		case "create":
+			isPressed = buttonState.get(creatingButton);
 			
-			panel.setPlaceVertex(!isPressed);
-			panel.setPlaceEdge(false);
+			panel.setCreating(!isPressed);
 			
-			vertexButton.getModel().setPressed(!isPressed);
-			buttonState.put(vertexButton, !isPressed);
+			creatingButton.getModel().setPressed(!isPressed);
+			buttonState.put(creatingButton, !isPressed);
 			
-			edgeButton.getModel().setPressed(false);
-			buttonState.put(edgeButton, false);
+			movingButton.getModel().setPressed(false);
+			buttonState.put(movingButton, false);
 			break;
-		case "edge":
-			isPressed = buttonState.get(edgeButton);
+		case "move":
+			isPressed = buttonState.get(movingButton);
 			
-			panel.setPlaceVertex(false);
-			panel.setPlaceEdge(!isPressed);
+			movingButton.getModel().setPressed(!isPressed);
+			buttonState.put(movingButton, !isPressed);
 			
-			edgeButton.getModel().setPressed(!isPressed);
-			buttonState.put(edgeButton, !isPressed);
-			
-			vertexButton.getModel().setPressed(false);
-			buttonState.put(vertexButton, false);
+			creatingButton.getModel().setPressed(false);
+			buttonState.put(creatingButton, false);
 		
 			break;
 		default:
