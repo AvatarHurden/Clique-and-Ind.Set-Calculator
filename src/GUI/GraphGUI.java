@@ -25,10 +25,14 @@ public class GraphGUI {
 		for (NodeGUI node : nodes)
 			if (!graph.containsNode(node.getValue()))
 				node.setEnabled(false);
+			else
+				node.setEnabled(true);
 		
 		for (EdgeGUI edge : edges)
 			if (!graph.hasConnection(edge.getStart().getValue(), edge.getEnd().getValue()))
 				edge.setEnabled(false);
+			else
+				edge.setEnabled(true);
 	}
 	
 	/**
