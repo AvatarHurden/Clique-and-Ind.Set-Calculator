@@ -45,6 +45,18 @@ public class Node {
 	}
 	
 	/**
+	 * Inverte as conexões de um nodo
+	 */
+	public void invertNeighbors(List<Node> nodes) {
+		for (Node n : nodes)
+			if (this.isNeighbor(n))
+				this.neighbors.remove((Object)n.getValue());
+			else
+				this.neighbors.add(n.getValue());
+	}
+	
+	
+	/**
 	 * Constroi uma representação em String do Nodo, formada pelo seu valor e,
 	 * possivelmente, seus vizinhos.
 	 * 
@@ -69,4 +81,5 @@ public class Node {
 		
 		return builder.toString();
 	}
+	
 }

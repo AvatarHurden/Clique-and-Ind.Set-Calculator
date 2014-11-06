@@ -52,6 +52,25 @@ public class Graph {
 	}
 	
 	/**
+	 * Cria um grafo complementar ao grafo original
+	 * Deleta os vizinhos existentes e adiciona os vizinhos inexistentes de cada nodo.
+	 * 
+	 * @param -
+	 * @return grafo G' complementar de G
+	 */
+	public Graph getComplement() {
+		Graph temp = new Graph(this);
+		
+		for(Node n : temp.nodes)
+			n.invertNeighbors(temp.nodes);
+		
+		return temp;
+	}
+	
+	
+	
+	
+	/**
 	 * Descobre o conjunto independente formado por esse grafo ao remover
 	 * os vizinhos dos nodos na ordem determinada pela lista passada como parâmetro.
 	 * 
@@ -119,10 +138,6 @@ public class Graph {
 		}
 		builder.append("]");
 		return builder.toString();
-	}
+	}	
 	
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/master
