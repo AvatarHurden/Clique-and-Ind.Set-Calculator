@@ -52,7 +52,8 @@ public class Node {
 			if (this.isNeighbor(n))
 				this.neighbors.remove((Object)n.getValue());
 			else
-				this.neighbors.add(n.getValue());
+				if(!this.equals(n))
+					this.neighbors.add(n.getValue());
 	}
 	
 	

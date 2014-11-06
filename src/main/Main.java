@@ -46,6 +46,12 @@ public class Main {
 		order.add(node9);
 		order.add(node10);
 		
+		
+		
+		System.out.println(graph.toString() + "\n");
+		Graph invgraph = graph.getComplement();
+		System.out.println(invgraph.toString());
+		
 		Permutations per = new Permutations();
 		
 		System.out.println("Starting");

@@ -67,9 +67,6 @@ public class Graph {
 		return temp;
 	}
 	
-	
-	
-	
 	/**
 	 * Descobre o conjunto independente formado por esse grafo ao remover
 	 * os vizinhos dos nodos na ordem determinada pela lista passada como parâmetro.
@@ -86,6 +83,8 @@ public class Graph {
 		
 		return temp;
 	}
+	
+	
 	
 	public void addNode(Node node) {
 		// Adiciona o Nodo apenas se ele não existe no grafo
