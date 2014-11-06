@@ -38,6 +38,8 @@ public class NodeGUI implements GraphElement {
 	@Override
 	public void setEnabled(boolean isEnabled) {
 		this.isEnabled = isEnabled;
+		if (!this.isEnabled)
+			setHovered(false);
 	}
 
 	@Override

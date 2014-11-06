@@ -47,7 +47,9 @@ public class GraphFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);	
 		
-		addKeyListener();
+		addKeyListener();		
+		
+		drawingPanel.setState(DrawingState.CREATING);
 	}
 	
 	private void setComponents() {
@@ -189,13 +191,13 @@ public class GraphFrame extends JFrame {
 //						subGraphs[0].getLocationOnScreen().y);   
 //				bot.mousePress(InputEvent.BUTTON1_MASK);
 //				bot.mouseRelease(InputEvent.BUTTON1_MASK);
-				
+
 				bot.mouseMove(p.x - 100, p.y - 100);
 //				bot.mouseMove(drawingPanel.getLocationOnScreen().x + 100, drawingPanel.getLocationOnScreen().y + 100);
 //				
 				bot.mouseMove(p.x, p.y);
-				drawingPanel.repaintComponents();
-				
+
+				drawingPanel.setHovered(new Point(100, 100), false);
 			}
 		});
 		

@@ -11,8 +11,6 @@ import main.Node;
 
 public class GraphGUI {
 	
-	private int value = 0;
-	
 	private List<NodeGUI> nodes;
 	private List<EdgeGUI> edges;
 
@@ -21,7 +19,7 @@ public class GraphGUI {
 		edges = new ArrayList<EdgeGUI>();
 	}
 	
-	public void enableSubGraph(Graph graph) {
+	public void setSubGraph(Graph graph) {
 		for (NodeGUI node : nodes)
 			if (!graph.containsNode(node.getValue()))
 				node.setEnabled(false);
@@ -58,7 +56,20 @@ public class GraphGUI {
 	 */
 	public NodeGUI createNode(Point point, Graphics g) {
 		NodeGUI node = new NodeGUI(point.x, point.y, g);
-		node.setValue(++value);
+		
+		int value = 0;
+		boolean free = true;
+		do {
+			free = true;
+			for (NodeGUI n : nodes)
+				if (n.getValue() == value) {
+					value++;
+					free = false;
+					break;
+				}
+		} while (!free);
+		
+		node.setValue(value);
 		nodes.add(node);
 		return node;
 	}

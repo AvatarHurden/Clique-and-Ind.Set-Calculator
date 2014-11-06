@@ -101,6 +101,8 @@ public class EdgeGUI implements GraphElement {
 	@Override
 	public void setEnabled(boolean isEnabled) {
 		this.isEnabled = isEnabled;
+		if (!isEnabled)
+			setHovered(false);
 	}
 	
 	@Override

@@ -25,13 +25,15 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		CREATING, MOVING, DELETING;
 	}
 	
-	private DrawingState state = DrawingState.CREATING;
+	private DrawingState state;
 	
 	private GraphGUI graph;
 	
 	private GraphElement hoveredElement;
 	private NodeGUI selected, tempNode;
 	private EdgeGUI edge;
+	
+	private String message;
 	
 	public DrawingPanel() {
 
@@ -59,7 +61,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Desativa elementos do grafo que não estejam em seu subgrafo, pintando o resultado
 	 */
 	public void enableSubGraph(Graph subGraph) {
-		graph.enableSubGraph(subGraph);
+		graph.setSubGraph(subGraph);
 		graph.drawGraph();
 	}
 	
@@ -80,14 +82,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	public void setMessage(String message) {
-		Graphics g = getGraphics();
-		
-		g.setColor(Color.WHITE);
-		g.fillRect(1, 1, 100, 20);
-		
-		g.setColor(Color.LIGHT_GRAY);
-		FontMetrics fm = getFontMetrics(getFont());
-		g.drawString(message, 10, fm.getMaxAscent() + 5);
+		this.message = message;
 	}
 	
 	/**
@@ -123,6 +118,23 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	public void repaintComponents() {
 		graph.drawGraph();
 		graph.setHovered(hoveredElement, true);
+		
+		Graphics g = getGraphics();
+		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+		drawMessage();
+	}
+	
+	public void drawMessage() {
+		Graphics g = getGraphics();
+		
+		if (getMousePosition().getX() < 100 && getMousePosition().getY() < 20) {
+			g.setColor(Color.WHITE);
+			g.fillRect(1, 1, 100, 20);
+		}
+		
+		g.setColor(Color.LIGHT_GRAY);
+		FontMetrics fm = getFontMetrics(getFont());
+		g.drawString(message, 10, fm.getMaxAscent() + 5);
 	}
 	
 	@Override
