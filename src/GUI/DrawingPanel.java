@@ -1,10 +1,11 @@
 package GUI;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -68,21 +69,25 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	public void setState(DrawingState state) {
 		if (this.state == state)
 			return;
+		
 		this.state = state;
 		
-		Graphics2D g = (Graphics2D) getGraphics();
+		setMessage(state.toString().substring(0, 1) + state.toString().substring(1).toLowerCase());
+	
+		setHovered(new Point(-100, -100), state != DrawingState.DELETING);
+		if (getMousePosition() != null)
+			setHovered(getMousePosition(), state == DrawingState.DELETING);
+	}
+	
+	public void setMessage(String message) {
+		Graphics g = getGraphics();
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(1, 1, 100, 20);
 		
 		g.setColor(Color.LIGHT_GRAY);
 		FontMetrics fm = getFontMetrics(getFont());
-		g.drawString(state.toString().substring(0, 1) + state.toString().substring(1).toLowerCase(), 
-				10, fm.getMaxAscent() + 5);
-	
-		setHovered(new Point(-100, -100), true);
-		setHovered(new Point(-100, -100), false);
-		setHovered(getMousePosition(), state == DrawingState.DELETING);
+		g.drawString(message, 10, fm.getMaxAscent() + 5);
 	}
 	
 	/**
@@ -104,6 +109,11 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		if (toDelete)
 			graph.setSelected(hoveredElement, toDelete);
 		
+		if (state == DrawingState.MOVING && hoveredElement != null)
+			setCursor(new Cursor(Cursor.HAND_CURSOR));
+		else
+			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			
 		repaintComponents();
 	}
 	
@@ -271,5 +281,4 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {}
-
 }

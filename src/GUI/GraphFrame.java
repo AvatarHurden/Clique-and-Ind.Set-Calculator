@@ -6,6 +6,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,7 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.LineBorder;
 
 import main.Graph;
 import main.Node;
@@ -29,7 +32,7 @@ public class GraphFrame extends JFrame {
 	private JButton doneButton;
 	
 	private JPanel[] subGraphs;
-	private JPanel subGraphsPanel, emptyPanel;
+	private JPanel subGraphsPanel;
 	
 	private Graph graph, graphClique, graphIndep;
 	
@@ -58,7 +61,6 @@ public class GraphFrame extends JFrame {
 		
 		makeSubGraphSelectionPanel();
 		
-		add(emptyPanel, c);
 		add(subGraphsPanel, c);
 		
 		// Tela de desenho
@@ -80,21 +82,26 @@ public class GraphFrame extends JFrame {
 			public void mouseClicked(MouseEvent ev) {
 				JPanel source = (JPanel) ev.getSource();
 				
+				if (doneButton.getText().equals("Calcular"))
+					return;
+				
+				for (JPanel p : subGraphs) {
+					p.setBackground(new Color(200, 200, 200));
+					p.setBorder(new LineBorder(Color.DARK_GRAY));
+				}
+				
 				source.setBackground(new Color(150, 150, 150));
-				source.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
 				
-				for (JPanel p : subGraphs)
-					if (p != source) {
-						p.setBackground(new Color(200, 200, 200));
-						p.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
-					}
-				
-				if (source.equals(subGraphs[0]))
+				if (source.equals(subGraphs[0])) {
 					drawingPanel.enableSubGraph(graph);
-				else if (source.equals(subGraphs[1]))
+					drawingPanel.setMessage("Grafo");
+				} else if (source.equals(subGraphs[1])) {
 					drawingPanel.enableSubGraph(graphClique);
-				else if (source.equals(subGraphs[2]))
+					drawingPanel.setMessage("\u03C9(G) = " + graphClique.getSize());
+				} else if (source.equals(subGraphs[2])) {
 					drawingPanel.enableSubGraph(graphIndep);
+					drawingPanel.setMessage("\u03B1(G) = " + graphIndep.getSize());
+				}
 				
 			}
 		};
@@ -110,12 +117,13 @@ public class GraphFrame extends JFrame {
 		subGraphs = new JPanel[] {panel1, panel2, panel3};
 		for (JPanel p : subGraphs) {	
 			p.setBackground(new Color(200, 200, 200));
-			p.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+			p.setBorder(new LineBorder(Color.DARK_GRAY));
 			p.addMouseListener(listener);
 		}
 		
+		panel1.setBackground(new Color(150, 150, 150));
+		
 		subGraphsPanel = new JPanel(new GridBagLayout());
-		subGraphsPanel.setVisible(false);
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridy = 0;
@@ -127,9 +135,6 @@ public class GraphFrame extends JFrame {
 		subGraphsPanel.add(panel2, c);
 		c.gridx++;
 		subGraphsPanel.add(panel3, c);
-		
-		emptyPanel = new JPanel();
-		emptyPanel.setPreferredSize(subGraphsPanel.getPreferredSize());
 	}
 	
 	private JButton setDoneButton() {
@@ -139,25 +144,58 @@ public class GraphFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
+				Robot bot = null;
+				try {
+					bot = new Robot();
+				} catch (Exception exc) {
+					return;
+				}
+				
+				Point p = MouseInfo.getPointerInfo().getLocation();
+
 				if (doneButton.getText().equals("Calcular")) {
 					graph = drawingPanel.getGraph();
 					graphClique = graph.getIndependentSet(graph.getNodes().toArray(new Node[]{}));
 					graphIndep = graphClique.getIndependentSet(graphClique.getNodes().toArray(new Node[]{}));
 				
 					doneButton.setText("Editar");
-					emptyPanel.setVisible(false);
-					subGraphsPanel.setVisible(true);
+					
+					for (JPanel panel : subGraphs) {
+						panel.setBorder(new LineBorder(Color.DARK_GRAY));
+						if (!panel.equals(subGraphs[0])) 
+							panel.setBackground(new Color(200, 200, 200));
+						else
+							panel.setBackground(new Color(150, 150, 150));
+					}
 					
 					drawingPanel.setState(DrawingState.MOVING);
-					drawingPanel.repaint();
+					
 				} else {
 					doneButton.setText("Calcular");
-					subGraphsPanel.setVisible(false);
-					emptyPanel.setVisible(true);
-					drawingPanel.setState(DrawingState.CREATING);
-					drawingPanel.repaint();
-				}
 					
+					for (JPanel panel : subGraphs) {
+						panel.setBorder(new LineBorder(Color.LIGHT_GRAY));
+						if (!panel.equals(subGraphs[0])) 
+							panel.setBackground(new Color(230, 230, 230));
+						else 
+							panel.setBackground(new Color(210, 210, 210));
+					}
+
+					drawingPanel.setState(DrawingState.CREATING);
+				}
+//				
+//				bot.mouseMove(subGraphs[0].getLocationOnScreen().x,
+//						subGraphs[0].getLocationOnScreen().y);   
+//				bot.mousePress(InputEvent.BUTTON1_MASK);
+//				bot.mouseRelease(InputEvent.BUTTON1_MASK);
+				
+				bot.mouseMove(p.x - 100, p.y - 100);
+//				bot.mouseMove(drawingPanel.getLocationOnScreen().x + 100, drawingPanel.getLocationOnScreen().y + 100);
+//				
+				bot.mouseMove(p.x, p.y);
+				drawingPanel.repaintComponents();
+				
 			}
 		});
 		
