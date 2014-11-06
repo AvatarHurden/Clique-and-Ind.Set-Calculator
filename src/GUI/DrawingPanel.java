@@ -2,6 +2,9 @@ package GUI;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,19 +21,20 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Estados possíveis do painel
 	 */
 	public enum DrawingState {
-		CREATING, MOVING, DELETING, NONE;
+		CREATING, MOVING, DELETING;
 	}
 	
-	private DrawingState state = DrawingState.NONE;
-	private boolean placingEdge = false;
+	private DrawingState state = DrawingState.CREATING;
 	
 	private GraphGUI graph;
 	
 	private GraphElement hoveredElement;
-	private NodeGUI selected;
+	private NodeGUI selected, tempNode;
 	private EdgeGUI edge;
 	
 	public DrawingPanel() {
+
+		setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		
 		setPreferredSize(new Dimension(800, 600));
 		setBorder(new LineBorder(Color.BLACK));
@@ -62,21 +66,44 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Define o estado do painel
 	 */
 	public void setState(DrawingState state) {
+		if (this.state == state)
+			return;
 		this.state = state;
+		
+		Graphics2D g = (Graphics2D) getGraphics();
+		
+		g.setColor(Color.WHITE);
+		g.fillRect(1, 1, 100, 20);
+		
+		g.setColor(Color.LIGHT_GRAY);
+		FontMetrics fm = getFontMetrics(getFont());
+		g.drawString(state.toString().substring(0, 1) + state.toString().substring(1).toLowerCase(), 
+				10, fm.getMaxAscent() + 5);
+	
+		setHovered(new Point(-100, -100), true);
+		setHovered(new Point(-100, -100), false);
+		setHovered(getMousePosition(), state == DrawingState.DELETING);
 	}
 	
 	/**
 	 * Define o elemento a ser "hovered", dada a posição do mouse.
 	 * Também pinta o elemento "hovered" com a aura
+	 * Se toDelete, coloca highlight no elemento no lugar da aura
 	 */
-	public void setHovered(Point point) {
-		GraphElement closest = graph.getClosest(point, false);
+	public void setHovered(Point point, boolean toDelete) {
+		GraphElement closest = graph.getClosest(point, toDelete);
 		
 		if (hoveredElement != closest)
-			graph.setHovered(hoveredElement, false);
+			if (toDelete)
+				graph.setSelected(hoveredElement, false);
+			else
+				graph.setHovered(hoveredElement, false);
 		
 		hoveredElement = closest;
-
+		
+		if (toDelete)
+			graph.setSelected(hoveredElement, toDelete);
+		
 		repaintComponents();
 	}
 	
@@ -107,10 +134,17 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Se estiver uma aresta sendo criada, ela é reposicionada e repintada
 	 */
 	public void dragCreate(Point p) {
-		if (placingEdge) {
+		setHovered(p, false);
+		
+		if (hoveredElement == null) {
 			graph.moveToPoint(edge, p);
-			setHovered(p);
+			graph.moveToPoint(tempNode, p);
+		} else {
+			tempNode.erase();
+			graph.moveToPoint(edge, p);
 		}
+		
+		repaintComponents();
 	}
 
 	/**
@@ -127,17 +161,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if (state == DrawingState.DELETING) {		
-			GraphElement closest = graph.getClosest(e.getPoint(), true);
-		
-			if (hoveredElement != closest)
-				graph.setSelected(hoveredElement, false);
-		
-			hoveredElement = closest;
-			
-			graph.setSelected(hoveredElement, true);
-		} else
-			setHovered(e.getPoint());
+		setHovered(e.getPoint(), state == DrawingState.DELETING);
 	}
 
 	// Um clique só é chamado quando o press e release ocorrem num período curto de tempo
@@ -145,21 +169,17 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		switch (state) {
-		case CREATING:
-			clickCreate(e.getPoint());
+		case DELETING:
+			clickDelete();
 			break;
 		default:
 			break;
 		}
 	}
 	
-	/**
-	 * Método a ser chamado quando o mouse for clicado no modo CREATING.
-	 * Cria um novo nodo e adiciona-o no grafo
-	 * @param p
-	 */
-	public void clickCreate(Point p) {
-		graph.createNode(p, getGraphics());
+	public void clickDelete() {
+		graph.delete(hoveredElement);
+		hoveredElement = null;
 		repaintComponents();
 	}
 
@@ -167,7 +187,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	public void mousePressed(MouseEvent e) {
 		switch (state) {
 		case CREATING:
-			pressCreate();
+			pressCreate(e.getPoint());
 			break;
 		case MOVING:
 			pressMove();
@@ -181,11 +201,15 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Método a ser chamado quando o mouse for pressionado no modo CREATING.
 	 * Se hoveredElement for um nodo, começa a criação de uma aresta no nodo
 	 */
-	public void pressCreate() {
+	public void pressCreate(Point point) {
+		if (hoveredElement == null)
+			hoveredElement = graph.createNode(point, getGraphics());
+		
 		if (hoveredElement instanceof NodeGUI) {
-			placingEdge = true;
 			edge = new EdgeGUI((NodeGUI) hoveredElement, getGraphics());
+			tempNode = new NodeGUI(point.x, point.y, getGraphics());
 		}
+			
 	}
 	
 	/**
@@ -198,10 +222,10 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
+	public void mouseReleased(MouseEvent e) {
 		switch (state) {
 		case CREATING:
-			releaseCreate();
+			releaseCreate(e.getPoint());
 			break;
 		case MOVING:
 			releaseMove();
@@ -216,20 +240,22 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Se hoveredElement for um nodo e uma aresta estiver sendo criada, termina a criação
 	 * e adiciona no grafo.
 	 */
-	public void releaseCreate() {
-		if (!placingEdge)
-			return;
+	public void releaseCreate(Point point) {
 		
-		placingEdge = false;
-		
-		// Finaliza a criação apenas se o hoveredElement for um nodo diferente do início da aresta
-		if (hoveredElement instanceof NodeGUI && !edge.isEdgeOf((NodeGUI) hoveredElement)) {
+		if (hoveredElement == null) {
+			tempNode = graph.createNode(point, getGraphics());
+			edge.setEnd(tempNode);
+			graph.addEdge(edge);
+		} else if (hoveredElement.equals(edge.getStart())) {
+			tempNode.erase();
+			edge.erase();
+		} else if (!edge.isEdgeOf((NodeGUI) hoveredElement)) {
 			edge.setEnd((NodeGUI) hoveredElement);
 			graph.addEdge(edge);
 		}
 		
 		edge.erase();
-		repaintComponents();	
+		setHovered(point, false);
 	}
 	
 	/**
