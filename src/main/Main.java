@@ -10,13 +10,13 @@ public class Main {
 	public static void main(String args[]) {
 		
 		Node node1 = new Node(1, 3, 9);
-		Node node2 = new Node(2, 4, 6);
+		Node node2 = new Node(2, 4, 7);
 		Node node3 = new Node(3, 1, 9);
-		Node node4 = new Node(4, 2, 9);
+		Node node4 = new Node(4, 6, 9);
 		Node node5 = new Node(5, 9);
 		Node node6 = new Node(6, 2, 8);
 		Node node7 = new Node(7, 9);
-		Node node8 = new Node(8, 6, 9);
+		Node node8 = new Node(8, 2, 9);
 		Node node9 = new Node(9, 1, 3, 4, 5, 7, 8);
 		Node node10 = new Node(10);
 		Node node11 = new Node(11, 1, 3, 4, 5, 7, 8);
@@ -51,8 +51,9 @@ public class Main {
 		
 		System.out.println("Starting");
 		
-		ArrayList<Graph> allMaximals = graph.getMaximalIS();
-		System.out.println(allMaximals);
+		System.out.println(graph.getMaximalIS());
+		
+		System.out.println(graph.getIndependentSet(order.toArray(new Node [order.size()])));
 		
 //		ArrayList<Node[]> permutaions = (per.permutations(order.toArray(new Node[]{})));
 		
