@@ -74,14 +74,46 @@ public class Graph {
 	 * @param order para remover os vizinhos
 	 * @return C.I.
 	 */
-	public Graph getIndependentSet(Node[] order) {
+	public Graph getIndependentSet(int[] order) {
 		Graph temp = new Graph(this);
 		
 		// Itera por todos os nós, removendo os vizinhos deles
-		for (Node n : order)
+		for (int n : order)
 			temp.removeNeighbors(n);
 		
 		return temp;
+	}
+	
+	public List<Graph> getMaximumIndependentSets() {
+		int[] array = new int[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+			array[i] = nodes.get(i).getValue();
+		
+		List<Graph> maxs = new ArrayList<Graph>();
+		
+		new Permutations() {
+			
+			int maxSize = 0;
+			
+			@Override
+			public void usePermutation(int[] per) {
+				Graph temp = getIndependentSet(per);
+				if (temp.getSize() > maxSize) {
+					maxs.clear();
+					maxSize = temp.getSize();
+				}
+				
+				boolean toAdd = true;
+				for (Graph g : maxs)
+					if (g.containsSameNodes(temp))
+						toAdd = false;
+				
+				if (toAdd && temp.getSize() >= maxSize)
+					maxs.add(temp);
+			}
+		}.permutations(array);
+		
+		return maxs;
 	}
 	
 	/**
@@ -97,7 +129,6 @@ public class Graph {
 			Graph maximal = new Graph(getIndependentSet(order));
 			
 			ArrayList<Graph> allMaximals = new ArrayList<Graph>();
-			allMaximals.clear();
 			
 			ArrayList<ArrayList<Node>> result = new ArrayList<ArrayList<Node>>();
 			
@@ -147,6 +178,19 @@ public class Graph {
 			nodes.add(node);
 	}
 	
+	public void removeNeighbors(int node) {
+		// Caso não posua o nodo em questão, não faz nada
+		if (!nodes.contains(getNode(node)))
+			return;
+		
+		// Itera por todos os nodos do grafo, removendo-os caso sejam vizinhos
+		// do parâmetro
+		Iterator<Node> iter = nodes.iterator();
+		while (iter.hasNext())
+			if (getNode(node).isNeighbor(iter.next()))
+				iter.remove();
+	}
+	
 	public void removeNeighbors(Node node) {
 		// Caso não posua o nodo em questão, não faz nada
 		if (!nodes.contains(node))
@@ -170,6 +214,16 @@ public class Graph {
 	
 	public String toString() {
 		return toString(true);
+	}
+	
+	public boolean containsSameNodes(Graph g) {
+		for (Node n : nodes)
+			if (!g.containsNode(n.getValue()))
+				return false;
+		for (Node n : g.nodes)
+			if (!containsNode(n.getValue()))
+				return false;
+		return true;
 	}
 	
 	/**

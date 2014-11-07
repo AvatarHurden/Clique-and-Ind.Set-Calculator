@@ -100,10 +100,8 @@ public class GraphFrame extends JFrame {
 					drawingPanel.setMessage("Grafo");
 				} else if (source.equals(subGraphs[1])) {
 					setGraphClique();
-					drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
 				} else if (source.equals(subGraphs[2])) {
 					setGraphIndep();
-					drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize());
 				}
 				
 			}
@@ -146,8 +144,9 @@ public class GraphFrame extends JFrame {
 			public void run() {
 				drawingPanel.setCalculating();
 				if (graphClique == null)
-				// Calcula
+				//Calcula
 				drawingPanel.setSubGraphs(graphClique);
+				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
 			}
 		});
 	}
@@ -158,10 +157,12 @@ public class GraphFrame extends JFrame {
 			public void run() {
 				drawingPanel.setCalculating();
 				if (graphIndep == null)
-				// Calcula
+					graphIndep = graph.getMaximumIndependentSets();
+				System.out.println(graphIndep);
+				drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize());
 				drawingPanel.setSubGraphs(graphIndep);
 			}
-		});
+		}).run();
 	}
 	
 	
@@ -196,6 +197,9 @@ public class GraphFrame extends JFrame {
 					}
 					
 					drawingPanel.setState(DrawingState.MOVING);
+					graph = drawingPanel.getGraph();
+					graphClique = null;
+					graphIndep = null;
 					
 				} else {
 					doneButton.setText("Calcular");

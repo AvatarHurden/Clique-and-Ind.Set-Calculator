@@ -1,13 +1,10 @@
 package GUI;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -29,7 +26,6 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	private DrawingState state;
-	private boolean changedMessage;
 	
 	private GraphGUI graph;
 	private List<Graph> subGraphs;
@@ -45,8 +41,6 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	public DrawingPanel() {
 
-		setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		
 		setPreferredSize(new Dimension(800, 600));
 		setBorder(new LineBorder(Color.BLACK));
 		setBackground(Color.white);
@@ -78,22 +72,17 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	public void setCalculating() {
-		Graphics2D g2d = (Graphics2D) getGraphics().create();
-		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		Graphics g = getGraphics();
 		
-		g2d.setColor(new Color(220, 220, 220));
-		g2d.fill3DRect(200, 200, 400, 50, true);
+		g.setColor(new Color(220, 220, 220));
+		g.fill3DRect(200, 200, 400, 50, true);
 		
-		g2d.setColor(Color.BLACK);
+		g.setColor(Color.BLACK);
 		FontMetrics fm = getFontMetrics(getFont());
-		g2d.drawString("Calculando", 
+		g.drawString("Calculando", 
 				400 - fm.stringWidth("Calculando") / 2, 225 + (fm.getMaxAscent() - fm.getMaxDescent()) / 2);
 		
-		g2d.dispose();
-		
-		try {
-		Thread.sleep(1000);
-		} catch (Exception e) {}
+		g.dispose();
 	}
 	
 	public void setSubGraphs(List<Graph> subGraphs) {
@@ -129,7 +118,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 			index = subGraphs.size() - 1;
 		else
 			index--;
-		
+
 		graph.setSubGraph(subGraphs.get(index));
 		graph.setGraphics(getGraphics());
 	}
@@ -152,7 +141,6 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	public void setMessage(String message) {
 		this.message = message;
-		changedMessage = true;
 	}
 	
 	/**
@@ -189,7 +177,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		graph.setGraphics(g);
 		graph.setHovered(hoveredElement, true);
 		
-		drawMessage();
+		drawMessage(g);
 
 		g.setColor(Color.BLACK);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
@@ -197,16 +185,10 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		arrow.paint(g);
 	}
 	
-	public void drawMessage() {
-		Graphics g = getGraphics();
-		
-		if (getMousePosition() == null || 
-				(getMousePosition().getX() < 100 && getMousePosition().getY() < 20) || changedMessage) {
-			g.setColor(Color.WHITE);
-			g.fillRect(1, 1, 100, 20);
-		}
-		
-		changedMessage = false;
+	public void drawMessage(Graphics g) {
+		 
+		g.setColor(Color.WHITE);
+		g.fillRect(1, 1, 100, 20);
 		
 		g.setColor(Color.LIGHT_GRAY);
 		FontMetrics fm = getFontMetrics(getFont());
@@ -272,8 +254,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 			clickDelete();
 			break;
 		case MOVING:
-			if (arrow.wasCliked(e.getPoint()))
-				System.out.println("hi");
+			arrow.wasCliked(e.getPoint());
 		default:
 			break;
 		}

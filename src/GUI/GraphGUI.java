@@ -32,6 +32,8 @@ public class GraphGUI {
 	}
 	
 	public void setSubGraph(Graph graph) {
+		enableAll();
+		
 		for (NodeGUI node : nodes)
 			if (!graph.containsNode(node.getValue()))
 				node.setEnabled(false);
