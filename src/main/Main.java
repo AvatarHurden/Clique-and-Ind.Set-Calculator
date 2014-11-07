@@ -41,20 +41,18 @@ public class Main {
 		order.add(node4);
 		order.add(node5);
 		order.add(node6);
-		order.add(node7);
-		order.add(node8);
-		order.add(node9);
-		order.add(node10);
+		//order.add(node7);
+		//order.add(node8);
+		//order.add(node9);
+		//order.add(node10);
 		
-		
-		
-		System.out.println(graph.toString() + "\n");
-		Graph invgraph = graph.getComplement();
-		System.out.println(invgraph.toString());
 		
 		Permutations per = new Permutations();
 		
 		System.out.println("Starting");
+		
+		ArrayList<Graph> allMaximals = graph.getMaximalIS();
+		System.out.println(allMaximals);
 		
 //		ArrayList<Node[]> permutaions = (per.permutations(order.toArray(new Node[]{})));
 		

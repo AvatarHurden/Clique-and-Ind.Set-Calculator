@@ -72,7 +72,7 @@ public class Graph {
 	 * os vizinhos dos nodos na ordem determinada pela lista passada como parâmetro.
 	 * 
 	 * @param order para remover os vizinhos
-	 * @return tamanho do C.I.
+	 * @return C.I.
 	 */
 	public Graph getIndependentSet(Node[] order) {
 		Graph temp = new Graph(this);
@@ -84,6 +84,61 @@ public class Graph {
 		return temp;
 	}
 	
+	/**
+	 * Cria uma lista com os maiores conjuntos independentes
+	 * 
+	 * @param order para permutar e utilizar na chamada de getIndependentSet
+	 * @return lista com todos C.I. maximais
+	 */
+	public ArrayList<Graph> getMaximalIS() {
+		
+			Node[] order = this.nodes.toArray(new Node[nodes.size()]);
+					
+			Graph maximal = new Graph(getIndependentSet(order));
+			
+			ArrayList<Graph> allMaximals = new ArrayList<Graph>();
+			allMaximals.clear();
+			
+			ArrayList<ArrayList<Node>> result = new ArrayList<ArrayList<Node>>();
+			
+			result.add(new ArrayList<Node>());
+		 
+			for (int i = 0; i < order.length; i++) {
+				ArrayList<ArrayList<Node>> current = new ArrayList<ArrayList<Node>>();
+		 
+				for (ArrayList<Node> l : result) {
+					for (int j = 0; j < l.size()+1; j++) {
+						l.add(j, order[i]);
+		 
+						ArrayList<Node> temp = new ArrayList<Node>(l);
+						current.clear();
+						current.add(temp);
+		 
+						if (l.size()+1 == order.length) {
+							Graph test = getIndependentSet(order);
+							
+							if (maximal.nodes.size() < test.nodes.size()){
+								maximal = test;
+								allMaximals.clear();
+								allMaximals.add(maximal);		
+							}else
+								if (maximal.nodes.size() == test.nodes.size())
+									allMaximals.add(test);
+							
+						}
+				
+						l.remove(j);
+					}
+				
+					
+				}
+				
+				result = new ArrayList<ArrayList<Node>>(current);
+			}
+			
+			return allMaximals;
+			
+	}
 	
 	
 	public void addNode(Node node) {
