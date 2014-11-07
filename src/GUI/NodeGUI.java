@@ -52,14 +52,14 @@ public class NodeGUI extends JPanel implements GraphElement {
 	public void setSelected(boolean isSelected) {
 		g.setColor(isSelected ? Color.RED : Color.WHITE);
 		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
-		paint();
+		//paint();
 	}
 	
 	@Override
 	public void setHighlight(boolean hasHighlight) {
 		g.setColor(hasHighlight ? (isEnabled? Color.BLUE : Color.LIGHT_GRAY) : Color.WHITE);
 		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
-		paint();
+		//paint();
 	}
 
 	@Override

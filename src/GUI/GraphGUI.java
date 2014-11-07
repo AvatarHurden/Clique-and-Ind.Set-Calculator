@@ -45,6 +45,13 @@ public class GraphGUI {
 				edge.setEnabled(true);
 	}
 	
+	public void enableAll() {
+		for (NodeGUI node : nodes)
+			node.setEnabled(true);
+		for (EdgeGUI edge : edges)
+			edge.setEnabled(true);
+	}
+	
 	/**
 	 * Cria um novo GraphGUI, removendo elementos que não estejam no grafo passado como
 	 * parâmetro

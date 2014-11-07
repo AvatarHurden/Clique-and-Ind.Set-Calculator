@@ -1,15 +1,18 @@
 package GUI;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
@@ -26,14 +29,19 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	private DrawingState state;
+	private boolean changedMessage;
 	
 	private GraphGUI graph;
+	private List<Graph> subGraphs;
+	private int index;
 	
 	private GraphElement hoveredElement;
 	private NodeGUI selected, tempNode;
 	private EdgeGUI edge;
 	
 	private String message;
+	
+	private SwitchArrows arrow;
 	
 	public DrawingPanel() {
 
@@ -47,6 +55,18 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		addMouseListener(this);
 
 		graph = new GraphGUI(getGraphics());
+		arrow = new SwitchArrows(getGraphics(), new Point(620,  4), graph) {
+			
+			@Override
+			public void clickRight() {
+				nextSubGraph();
+			}
+			
+			@Override
+			public void clickLeft() {
+				previousSubGraph();
+			}
+		};
 	}
 	
 	public Graph getGraph() {
@@ -57,11 +77,60 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		this.graph = graph;
 	}
 	
-	/**
-	 * Desativa elementos do grafo que não estejam em seu subgrafo, pintando o resultado
-	 */
-	public void enableSubGraph(Graph subGraph) {
-		graph.setSubGraph(subGraph);		
+	public void setCalculating() {
+		Graphics2D g2d = (Graphics2D) getGraphics().create();
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		
+		g2d.setColor(new Color(220, 220, 220));
+		g2d.fill3DRect(200, 200, 400, 50, true);
+		
+		g2d.setColor(Color.BLACK);
+		FontMetrics fm = getFontMetrics(getFont());
+		g2d.drawString("Calculando", 
+				400 - fm.stringWidth("Calculando") / 2, 225 + (fm.getMaxAscent() - fm.getMaxDescent()) / 2);
+		
+		g2d.dispose();
+		
+		try {
+		Thread.sleep(1000);
+		} catch (Exception e) {}
+	}
+	
+	public void setSubGraphs(List<Graph> subGraphs) {
+		this.subGraphs = subGraphs;
+		index = 0;
+		graph.setSubGraph(subGraphs.get(0));
+		graph.setGraphics(getGraphics());
+		arrow.setActive(true, getGraphics());
+		
+		repaint();
+	}
+	
+	public void removeSubGraphs() {
+		this.subGraphs = null;
+		graph.enableAll();
+		arrow.setActive(false, getGraphics());
+		
+		repaint();
+	}
+	
+	private void nextSubGraph() {
+		if (index == subGraphs.size() - 1)
+			index = 0;
+		else
+			index++;
+		
+		graph.setSubGraph(subGraphs.get(index));
+		graph.setGraphics(getGraphics());
+	}
+	
+	private void previousSubGraph() {
+		if (index == 0)
+			index = subGraphs.size() - 1;
+		else
+			index--;
+		
+		graph.setSubGraph(subGraphs.get(index));
 		graph.setGraphics(getGraphics());
 	}
 	
@@ -83,6 +152,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	public void setMessage(String message) {
 		this.message = message;
+		changedMessage = true;
 	}
 	
 	/**
@@ -93,11 +163,11 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	public void setHovered(Point point, boolean toDelete) {
 		GraphElement closest = graph.getClosest(point, toDelete);
 		
-		if (hoveredElement != closest)
+		if (hoveredElement != closest) {
 			if (toDelete)
 				graph.setSelected(hoveredElement, false);
-			else
-				graph.setHovered(hoveredElement, false);
+			graph.setHovered(hoveredElement, false);
+		}
 		
 		hoveredElement = closest;
 		
@@ -124,17 +194,19 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		g.setColor(Color.BLACK);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 		
-		new SwitchArrows(g, getWidth(), graph);
+		arrow.paint(g);
 	}
 	
 	public void drawMessage() {
 		Graphics g = getGraphics();
 		
 		if (getMousePosition() == null || 
-				(getMousePosition().getX() < 100 && getMousePosition().getY() < 20)) {
+				(getMousePosition().getX() < 100 && getMousePosition().getY() < 20) || changedMessage) {
 			g.setColor(Color.WHITE);
 			g.fillRect(1, 1, 100, 20);
 		}
+		
+		changedMessage = false;
 		
 		g.setColor(Color.LIGHT_GRAY);
 		FontMetrics fm = getFontMetrics(getFont());
@@ -187,7 +259,8 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		setHovered(e.getPoint(), state == DrawingState.DELETING);
+		if (!arrow.isHovered(e.getPoint(), getGraphics()))
+			setHovered(e.getPoint(), state == DrawingState.DELETING);
 	}
 
 	// Um clique só é chamado quando o press e release ocorrem num período curto de tempo
@@ -198,6 +271,9 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		case DELETING:
 			clickDelete();
 			break;
+		case MOVING:
+			if (arrow.wasCliked(e.getPoint()))
+				System.out.println("hi");
 		default:
 			break;
 		}

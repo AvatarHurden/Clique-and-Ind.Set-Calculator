@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import main.Graph;
-import main.Node;
 import GUI.DrawingPanel.DrawingState;
 
 public class GraphFrame extends JFrame {
@@ -34,7 +34,8 @@ public class GraphFrame extends JFrame {
 	private JPanel[] subGraphs;
 	private JPanel subGraphsPanel;
 	
-	private Graph graph, graphClique, graphIndep;
+	private Graph graph; 
+	private List<Graph> graphClique, graphIndep;
 	
 	public GraphFrame() {
 		setComponents();
@@ -95,14 +96,14 @@ public class GraphFrame extends JFrame {
 				source.setBackground(new Color(150, 150, 150));
 				
 				if (source.equals(subGraphs[0])) {
-					drawingPanel.enableSubGraph(graph);
+					drawingPanel.removeSubGraphs();
 					drawingPanel.setMessage("Grafo");
 				} else if (source.equals(subGraphs[1])) {
-					drawingPanel.enableSubGraph(graphClique);
-					drawingPanel.setMessage("\u03C9(G) = " + graphClique.getSize());
+					setGraphClique();
+					drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
 				} else if (source.equals(subGraphs[2])) {
-					drawingPanel.enableSubGraph(graphIndep);
-					drawingPanel.setMessage("\u03B1(G) = " + graphIndep.getSize());
+					setGraphIndep();
+					drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize());
 				}
 				
 			}
@@ -139,6 +140,31 @@ public class GraphFrame extends JFrame {
 		subGraphsPanel.add(panel3, c);
 	}
 	
+	private void setGraphClique() {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				drawingPanel.setCalculating();
+				if (graphClique == null)
+				// Calcula
+				drawingPanel.setSubGraphs(graphClique);
+			}
+		});
+	}
+	
+	private void setGraphIndep() {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				drawingPanel.setCalculating();
+				if (graphIndep == null)
+				// Calcula
+				drawingPanel.setSubGraphs(graphIndep);
+			}
+		});
+	}
+	
+	
 	private JButton setDoneButton() {
 		doneButton = new JButton("Calcular");
 		
@@ -158,9 +184,7 @@ public class GraphFrame extends JFrame {
 
 				if (doneButton.getText().equals("Calcular")) {
 					graph = drawingPanel.getGraph();
-					graphClique = graph.getIndependentSet(graph.getNodes().toArray(new Node[]{}));
-					graphIndep = graphClique.getIndependentSet(graphClique.getNodes().toArray(new Node[]{}));
-				
+					
 					doneButton.setText("Editar");
 					
 					for (JPanel panel : subGraphs) {
@@ -185,6 +209,7 @@ public class GraphFrame extends JFrame {
 					}
 
 					drawingPanel.setState(DrawingState.CREATING);
+					drawingPanel.removeSubGraphs();
 				}
 //				
 //				bot.mouseMove(subGraphs[0].getLocationOnScreen().x,
