@@ -35,7 +35,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	private NodeGUI selected, tempNode;
 	private EdgeGUI edge;
 	
-	private String message;
+	private String[] messages;
 	
 	private SwitchArrows arrow;
 	
@@ -139,8 +139,8 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 			setHovered(getMousePosition(), state == DrawingState.DELETING);
 	}
 	
-	public void setMessage(String message) {
-		this.message = message;
+	public void setMessage(String... message) {
+		this.messages = message;
 	}
 	
 	/**
@@ -186,13 +186,18 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	public void drawMessage(Graphics g) {
-		 
+		FontMetrics fm = getFontMetrics(getFont());
+		
+		int width = 0;
+		for (String s : messages)
+			width = Math.max(width, fm.stringWidth(s));
+		
 		g.setColor(Color.WHITE);
-		g.fillRect(1, 1, 100, 20);
+		g.fillRect(1, 1, width + 20, 20 * messages.length);
 		
 		g.setColor(Color.LIGHT_GRAY);
-		FontMetrics fm = getFontMetrics(getFont());
-		g.drawString(message, 10, fm.getMaxAscent() + 5);
+		for (int i = 0; i < messages.length; i++)
+			g.drawString(messages[i], 10, fm.getMaxAscent() + 5 + i*20);
 	}
 	
 	@Override

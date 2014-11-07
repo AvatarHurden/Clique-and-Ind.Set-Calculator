@@ -146,7 +146,8 @@ public class GraphFrame extends JFrame {
 				if (graphClique == null)
 				//Calcula
 				drawingPanel.setSubGraphs(graphClique);
-				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
+				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize() + "\n" +
+						graphClique.size() + " conjuntos");
 			}
 		});
 	}
@@ -156,10 +157,14 @@ public class GraphFrame extends JFrame {
 			@Override
 			public void run() {
 				drawingPanel.setCalculating();
+				long time = System.currentTimeMillis();
 				if (graphIndep == null)
 					graphIndep = graph.getMaximumIndependentSets();
+				time = System.currentTimeMillis() - time;
+				
 				System.out.println(graphIndep);
-				drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize());
+				drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize(),
+						graphIndep.size() + " conjuntos", time/1000.0 + " segundos p/ processar");
 				drawingPanel.setSubGraphs(graphIndep);
 			}
 		}).run();
