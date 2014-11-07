@@ -120,94 +120,17 @@ public class Graph {
 		return maxs;
 	}
 	
+	
 	/**
-	 * Cria uma lista com os maiores conjuntos independentes
+	 * Retorna uma lista de cliques a partir dos C.I. maximais do grafo original invertido
 	 * 
-	 * @param order para permutar e utilizar na chamada de getIndependentSet
-	 * @return lista com todos C.I. maximais
+	 * @return lista com todos cliques
 	 */
-	public List<Graph> getMaximalIS() {
-		List<List<Node>> maximalNodesList = getMaximalISList(nodes);
-		List<Graph> maximalGraphs = new ArrayList<Graph>();
-		
-			Node[] order = this.nodes.toArray(new Node[nodes.size()]);
-					
-			Graph maximal = new Graph(getIndependentSet(order));
-			
-			ArrayList<Graph> allMaximals = new ArrayList<Graph>();
-			
-			ArrayList<ArrayList<Node>> result = new ArrayList<ArrayList<Node>>();
-			
-			result.add(new ArrayList<Node>());
-		 
-			for (int i = 0; i < order.length; i++) {
-				ArrayList<ArrayList<Node>> current = new ArrayList<ArrayList<Node>>();
-		 
-				for (ArrayList<Node> l : result) {
-					for (int j = 0; j < l.size()+1; j++) {
-						l.add(j, order[i]);
-		 
-						ArrayList<Node> temp = new ArrayList<Node>(l);
-						current.clear();
-						current.add(temp);
-		 
-						if (l.size()+1 == order.length) {
-							Graph test = getIndependentSet(order);
-							
-							if (maximal.nodes.size() < test.nodes.size()){
-								maximal = test;
-								allMaximals.clear();
-								allMaximals.add(maximal);		
-							}else
-								if (maximal.nodes.size() == test.nodes.size())
-									allMaximals.add(test);
-							
-						}
-				
-						l.remove(j);
-					}
-				
-					
-				}
-				
-				result = new ArrayList<ArrayList<Node>>(current);
-			}
-			
-			return allMaximals;
-		for (int i=0; i < maximalNodesList.size(); i++) {
-			maximalGraphs.set(i, new Graph(maximalNodesList.get(i)));
-			
-		}
-		
-		return maximalGraphs;
+	public List<Graph> getCliques() {
+		Graph invGraph = this.getComplement();
+		List<Graph> cliques = invGraph.getMaximumIndependentSets();
+		return cliques;
 	}
-	public List<List<Node>> getMaximalISList(List<Node> original) {
-		
-		
-		if (original.size() == 0) { 
-			List<List<Node>> result = new ArrayList<List<Node>>();
-			result.add(new ArrayList<Node>());
-			return result;
-	     }
-		
-		Node firstElement = original.remove(0);
-	    List<List<Node>> returnValue = new ArrayList<List<Node>>();
-	    List<List<Node>> permutations = getMaximalISList(original);
-	    
-	    for (List<Node> smallerPermutated : permutations)
-	    	for (int i=0; i <= smallerPermutated.size(); i++) {
-	    		List<Node> temp = new ArrayList<Node>(smallerPermutated);
-		        temp.add(i, firstElement);
-		        
-		        
-		        if (returnValue.get(0).size() < (getIndependentSet(temp.toArray(new Node [temp.size()])).nodes.size())) {
-		        	returnValue.clear();
-		        	returnValue.add(temp);
-		        }
-		        
-	    	}
-	    return returnValue;
-	 }		
 	
 	
 	public void addNode(Node node) {
