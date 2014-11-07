@@ -6,7 +6,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
-public class EdgeGUI implements GraphElement {
+import javax.swing.JPanel;
+
+public class EdgeGUI extends JPanel implements GraphElement {
 	
 	// Graphics é como objetos são desenhados na tela
 	private Graphics g;
@@ -22,6 +24,11 @@ public class EdgeGUI implements GraphElement {
 		this.g = g;
 		this.start = start;
 		start.setHighlight(true);
+	}
+	
+	@Override
+	public void setGraphics(Graphics g) {
+		this.g = g;
 	}
 	
 	/**
@@ -160,12 +167,17 @@ public class EdgeGUI implements GraphElement {
 	 * se são objetos diferentes.
 	 */
 	@Override
-	public boolean equals(Object edge) {
-		if (!(edge instanceof EdgeGUI))
+	public boolean equals(Object obj) {
+		if (!(obj instanceof EdgeGUI))
 			return false;
 		
-		return (start.equals(((EdgeGUI)edge).start) && end.equals(((EdgeGUI)edge).end)) || 
-				(start.equals(((EdgeGUI)edge).end) && end.equals(((EdgeGUI)edge).start));
+		EdgeGUI edge = (EdgeGUI) obj;
+		
+		if ((end == null && edge.end != null) || (end != null && edge.end == null))
+			return false;
+		
+		return (start.equals(edge.start) && end.equals(edge.end)) || 
+				(start.equals(edge.end) && end.equals(edge.start));
 	}
 
 }

@@ -11,12 +11,24 @@ import main.Node;
 
 public class GraphGUI {
 	
+	private Graphics g;
+	
 	private List<NodeGUI> nodes;
 	private List<EdgeGUI> edges;
 
-	public GraphGUI() {
+	public GraphGUI(Graphics g) {
+		this.g = g;
 		nodes = new ArrayList<NodeGUI>();
 		edges = new ArrayList<EdgeGUI>();
+	}
+	
+	public void setGraphics(Graphics g) {
+		this.g = g;
+		for (GraphElement e : nodes)
+			e.setGraphics(g);
+		for (GraphElement e : edges)
+			e.setGraphics(g);
+		drawGraph();
 	}
 	
 	public void setSubGraph(Graph graph) {
@@ -38,7 +50,7 @@ public class GraphGUI {
 	 * parâmetro
 	 */
 	public GraphGUI deriveGraphGUI(Graph graph) {
-		GraphGUI graphGUI = new GraphGUI();
+		GraphGUI graphGUI = new GraphGUI(g);
 		
 		for (NodeGUI node : nodes)
 			if (graph.containsNode(node.getValue()))
@@ -57,7 +69,7 @@ public class GraphGUI {
 	public NodeGUI createNode(Point point, Graphics g) {
 		NodeGUI node = new NodeGUI(point.x, point.y, g);
 		
-		int value = 0;
+		int value = 1;
 		boolean free = true;
 		do {
 			free = true;
@@ -70,6 +82,7 @@ public class GraphGUI {
 		} while (!free);
 		
 		node.setValue(value);
+		node.setGraphics(g);
 		nodes.add(node);
 		return node;
 	}
@@ -78,16 +91,20 @@ public class GraphGUI {
 	 * Adiciona o nodo à lista, caso não o possua
 	 */
 	public void addNode(NodeGUI node) {
-		if (!nodes.contains(node))
+		if (!nodes.contains(node)) {
+			node.setGraphics(g);
 			nodes.add(node);
+		}
 	}
 	
 	/**
 	 * Adiciona a aresta à lista, caso não a possua
 	 */
 	public void addEdge(EdgeGUI edge) {
-		if (!edges.contains(edge))
+		if (!edges.contains(edge)) {
+			edge.setGraphics(g);
 			edges.add(edge);	
+		}
 	}
 	
 	/**
@@ -96,7 +113,7 @@ public class GraphGUI {
 	public void drawGraph() {
 		for (GraphElement e : edges)
 			e.paint();
-		for (GraphElement e : nodes) 
+		for (GraphElement e : nodes)
 			e.paint();
 	}
 	

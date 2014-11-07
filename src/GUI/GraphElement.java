@@ -1,5 +1,6 @@
 package GUI;
 
+import java.awt.Graphics;
 import java.awt.Point;
 
 /**
@@ -8,6 +9,8 @@ import java.awt.Point;
  * @author Arthur
  */
 public interface GraphElement {
+	
+	public void setGraphics(Graphics g);
 	
 	/**
 	 * Se ativo, objeto tem cores normais. Caso contrário, fica cinza

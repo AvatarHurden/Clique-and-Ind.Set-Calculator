@@ -118,12 +118,12 @@ public class GraphFrame extends JFrame {
 		
 		subGraphs = new JPanel[] {panel1, panel2, panel3};
 		for (JPanel p : subGraphs) {	
-			p.setBackground(new Color(200, 200, 200));
-			p.setBorder(new LineBorder(Color.DARK_GRAY));
+			p.setBackground(new Color(230, 230, 230));
+			p.setBorder(new LineBorder(Color.LIGHT_GRAY));
 			p.addMouseListener(listener);
 		}
 		
-		panel1.setBackground(new Color(150, 150, 150));
+		panel1.setBackground(new Color(210, 210, 210));
 		
 		subGraphsPanel = new JPanel(new GridBagLayout());
 		

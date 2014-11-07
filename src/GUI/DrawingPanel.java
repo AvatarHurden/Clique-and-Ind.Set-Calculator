@@ -46,7 +46,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		addMouseMotionListener(this);
 		addMouseListener(this);
 
-		graph = new GraphGUI();
+		graph = new GraphGUI(getGraphics());
 	}
 	
 	public Graph getGraph() {
@@ -61,8 +61,8 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	 * Desativa elementos do grafo que não estejam em seu subgrafo, pintando o resultado
 	 */
 	public void enableSubGraph(Graph subGraph) {
-		graph.setSubGraph(subGraph);
-		graph.drawGraph();
+		graph.setSubGraph(subGraph);		
+		graph.setGraphics(getGraphics());
 	}
 	
 	/**
@@ -109,25 +109,29 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		else
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			
-		repaintComponents();
+		repaintComponents(getGraphics());
 	}
 	
 	/**
 	 * Pinta todos os elementos na tela, colocando ênfase nos adequados
 	 */
-	public void repaintComponents() {
-		graph.drawGraph();
+	public void repaintComponents(Graphics g) {
+		graph.setGraphics(g);
 		graph.setHovered(hoveredElement, true);
 		
-		Graphics g = getGraphics();
-		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 		drawMessage();
+
+		g.setColor(Color.BLACK);
+		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+		
+		new SwitchArrows(g, getWidth(), graph);
 	}
 	
 	public void drawMessage() {
 		Graphics g = getGraphics();
 		
-		if (getMousePosition().getX() < 100 && getMousePosition().getY() < 20) {
+		if (getMousePosition() == null || 
+				(getMousePosition().getX() < 100 && getMousePosition().getY() < 20)) {
 			g.setColor(Color.WHITE);
 			g.fillRect(1, 1, 100, 20);
 		}
@@ -166,7 +170,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 			graph.moveToPoint(edge, p);
 		}
 		
-		repaintComponents();
+		repaintComponents(getGraphics());
 	}
 
 	/**
@@ -176,7 +180,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	public void dragMove(Point p) {
 		if (selected != null) {
 			graph.moveToPoint(selected, p);
-			repaintComponents();
+			repaintComponents(getGraphics());
 		}
 	}
 
@@ -202,7 +206,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	public void clickDelete() {
 		graph.delete(hoveredElement);
 		hoveredElement = null;
-		repaintComponents();
+		repaintComponents(getGraphics());
 	}
 
 	@Override
@@ -266,8 +270,8 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		
 		if (hoveredElement == null) {
 			tempNode = graph.createNode(point, getGraphics());
-			edge.setEnd(tempNode);
 			graph.addEdge(edge);
+			edge.setEnd(tempNode);
 		} else if (hoveredElement.equals(edge.getStart())) {
 			tempNode.erase();
 			edge.erase();
@@ -293,4 +297,12 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {}
+	
+	@Override
+	public void paint(Graphics g) {
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, getWidth(), getHeight());
+		
+		repaintComponents(g);
+	}
 }

@@ -6,8 +6,9 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-public class NodeGUI implements GraphElement {
+public class NodeGUI extends JPanel implements GraphElement {
 	
 	// tamanho do raio do Nodo e da aura do nodo
 	public static final int RADIUS = 15;
@@ -22,9 +23,9 @@ public class NodeGUI implements GraphElement {
 	private boolean isEnabled = true;
 	
 	public NodeGUI(int x, int y, Graphics g) {
+		this.g = g;
 		this.x = x;
 		this.y = y;
-		this.g = g;	
 	}
 	
 	public void setValue(int value) {
@@ -33,6 +34,11 @@ public class NodeGUI implements GraphElement {
 	
 	public int getValue() {
 		return Integer.valueOf(value);
+	}
+	
+	@Override
+	public void setGraphics(Graphics g) {
+		this.g = g;
 	}
 	
 	@Override
