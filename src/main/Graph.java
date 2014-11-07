@@ -19,6 +19,10 @@ public class Graph {
 		this.nodes = new ArrayList<Node>(graph.nodes);
 	}
 	
+	public Graph(List<Node> nodes) {
+		this.nodes = new ArrayList<Node>(nodes);
+	}
+	
 	/**
 	 * Verifica se o grafo contém o nó com o valor especificado.
 	 */
@@ -122,7 +126,9 @@ public class Graph {
 	 * @param order para permutar e utilizar na chamada de getIndependentSet
 	 * @return lista com todos C.I. maximais
 	 */
-	public ArrayList<Graph> getMaximalIS() {
+	public List<Graph> getMaximalIS() {
+		List<List<Node>> maximalNodesList = getMaximalISList(nodes);
+		List<Graph> maximalGraphs = new ArrayList<Graph>();
 		
 			Node[] order = this.nodes.toArray(new Node[nodes.size()]);
 					
@@ -168,8 +174,40 @@ public class Graph {
 			}
 			
 			return allMaximals;
+		for (int i=0; i < maximalNodesList.size(); i++) {
+			maximalGraphs.set(i, new Graph(maximalNodesList.get(i)));
 			
+		}
+		
+		return maximalGraphs;
 	}
+	public List<List<Node>> getMaximalISList(List<Node> original) {
+		
+		
+		if (original.size() == 0) { 
+			List<List<Node>> result = new ArrayList<List<Node>>();
+			result.add(new ArrayList<Node>());
+			return result;
+	     }
+		
+		Node firstElement = original.remove(0);
+	    List<List<Node>> returnValue = new ArrayList<List<Node>>();
+	    List<List<Node>> permutations = getMaximalISList(original);
+	    
+	    for (List<Node> smallerPermutated : permutations)
+	    	for (int i=0; i <= smallerPermutated.size(); i++) {
+	    		List<Node> temp = new ArrayList<Node>(smallerPermutated);
+		        temp.add(i, firstElement);
+		        
+		        
+		        if (returnValue.get(0).size() < (getIndependentSet(temp.toArray(new Node [temp.size()])).nodes.size())) {
+		        	returnValue.clear();
+		        	returnValue.add(temp);
+		        }
+		        
+	    	}
+	    return returnValue;
+	 }		
 	
 	
 	public void addNode(Node node) {
