@@ -52,7 +52,7 @@ public class Main {
 		
 		//System.out.println(graph.getIndependentSet(order.toArray(new Node [order.size()])));
 		
-		//ArrayList<Node[]> permutaions = (per.permutations(order.toArray(new Node[]{})));
+//		ArrayList<Node[]> permutaions = (per.permutations(order.toArray(new Node[]{})));
 		
 		System.out.println("Permuted");
 		

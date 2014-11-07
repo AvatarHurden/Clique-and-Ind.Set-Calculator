@@ -144,12 +144,11 @@ public class GraphFrame extends JFrame {
 			public void run() {
 				drawingPanel.setCalculating();
 				if (graphClique == null)
-					graphClique = graph.getCliques();
-				System.out.println(graphClique);
-				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
+				//Calcula
 				drawingPanel.setSubGraphs(graphClique);
+				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
 			}
-		}).run();
+		});
 	}
 	
 	private void setGraphIndep() {
