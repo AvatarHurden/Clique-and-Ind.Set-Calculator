@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import jdk.nashorn.internal.runtime.Timing;
 import main.Graph;
 import GUI.DrawingPanel.DrawingState;
 
@@ -36,6 +37,7 @@ public class GraphFrame extends JFrame {
 	
 	private Graph graph; 
 	private List<Graph> graphClique, graphIndep;
+	private long timeClique, timeIndep;
 	
 	public GraphFrame() {
 		setComponents();
@@ -99,9 +101,15 @@ public class GraphFrame extends JFrame {
 					drawingPanel.removeSubGraphs();
 					drawingPanel.setMessage("Grafo");
 				} else if (source.equals(subGraphs[1])) {
-					setGraphClique();
+					if (graphClique == null)
+						drawingPanel.setCalculating();
+					else
+						setGraphClique();
 				} else if (source.equals(subGraphs[2])) {
-					setGraphIndep();
+					if (graphIndep == null)
+						drawingPanel.setCalculating();
+					else
+						setGraphIndep();
 				}
 				
 			}
@@ -139,36 +147,31 @@ public class GraphFrame extends JFrame {
 	}
 	
 	private void setGraphClique() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				drawingPanel.setCalculating();
-				long time = System.currentTimeMillis();
-				if (graphClique == null)
-					graphClique = graph.getCliques();
-				time = System.currentTimeMillis() - time;
-				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize(),
-						graphClique.size() + " conjuntos", time/1000.0 + " segundos p/ processar");
-				drawingPanel.setSubGraphs(graphClique);
-			}
-		}).run();
+		if (graphClique == null) {
+			timeClique = System.currentTimeMillis();
+			graphClique = graph.getCliques();
+			timeClique = System.currentTimeMillis() - timeClique;
+		}
+				
+		if (subGraphs[1].getBackground().equals(new Color(150, 150, 150))) {
+			drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize(),
+					graphClique.size() + " conjuntos", timeClique/1000.0 + " segundos p/ processar");
+			drawingPanel.setSubGraphs(graphClique);
+		}
 	}
 	
 	private void setGraphIndep() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				drawingPanel.setCalculating();
-				long time = System.currentTimeMillis();
-				if (graphIndep == null)
-					graphIndep = graph.getMaximumIndependentSets();
-				time = System.currentTimeMillis() - time;
+		if (graphIndep == null) {
+			timeIndep = System.currentTimeMillis();
+			graphIndep = graph.getMaximumIndependentSets();
+			timeIndep = System.currentTimeMillis() - timeIndep;
+		}
 				
-				drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize(),
-						graphIndep.size() + " conjuntos", time/1000.0 + " segundos p/ processar");
-				drawingPanel.setSubGraphs(graphIndep);
-			}
-		}).run();
+		if (subGraphs[2].getBackground().equals(new Color(150, 150, 150))) {
+			drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize(),
+					graphIndep.size() + " conjuntos", timeIndep/1000.0 + " segundos p/ processar");
+			drawingPanel.setSubGraphs(graphIndep);
+		}
 	}
 	
 	
@@ -204,8 +207,20 @@ public class GraphFrame extends JFrame {
 					
 					drawingPanel.setState(DrawingState.MOVING);
 					graph = drawingPanel.getGraph();
-					graphClique = null;
-					graphIndep = null;
+					
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							setGraphIndep();
+						}
+					}).start();
+					
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							setGraphClique();
+						}
+					}).start();
 					
 				} else {
 					doneButton.setText("Calcular");
