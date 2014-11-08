@@ -143,18 +143,13 @@ public class GraphFrame extends JFrame {
 			@Override
 			public void run() {
 				drawingPanel.setCalculating();
+				long time = System.currentTimeMillis();
 				if (graphClique == null)
-<<<<<<< HEAD
 					graphClique = graph.getCliques();
-				System.out.println(graphClique);
-				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize());
+				time = System.currentTimeMillis() - time;
+				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize(),
+						graphClique.size() + " conjuntos", time/1000.0 + " segundos p/ processar");
 				drawingPanel.setSubGraphs(graphClique);
-=======
-				//Calcula
-				drawingPanel.setSubGraphs(graphClique);
-				drawingPanel.setMessage("\u03C9(G) = " + graphClique.get(0).getSize() + "\n" +
-						graphClique.size() + " conjuntos");
->>>>>>> origin/master
 			}
 		}).run();
 	}
@@ -169,7 +164,6 @@ public class GraphFrame extends JFrame {
 					graphIndep = graph.getMaximumIndependentSets();
 				time = System.currentTimeMillis() - time;
 				
-				System.out.println(graphIndep);
 				drawingPanel.setMessage("\u03B1(G) = " + graphIndep.get(0).getSize(),
 						graphIndep.size() + " conjuntos", time/1000.0 + " segundos p/ processar");
 				drawingPanel.setSubGraphs(graphIndep);
