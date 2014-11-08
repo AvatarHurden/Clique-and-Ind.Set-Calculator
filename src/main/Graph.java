@@ -16,7 +16,9 @@ public class Graph {
 	 * Cria um clone do grafo passado como parâmetro
 	 */
 	public Graph(Graph graph) {
-		this.nodes = new ArrayList<Node>(graph.nodes);
+		this.nodes = new ArrayList<Node>();
+		for (Node n : graph.nodes)
+			nodes.add(new Node(n));
 	}
 	
 	public Graph(List<Node> nodes) {
@@ -65,7 +67,7 @@ public class Graph {
 	public Graph getComplement() {
 		Graph temp = new Graph(this);
 		
-		for(Node n : temp.nodes)
+		for (Node n : temp.nodes)
 			n.invertNeighbors(temp.nodes);
 		
 		return temp;

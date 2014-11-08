@@ -16,6 +16,13 @@ public class Node {
 		setNeighbors(neighbors);
 	}
 	
+	public Node(Node n) {
+		this.value = n.getValue();
+		this.neighbors = new ArrayList<Integer>();
+		for (Integer i : n.neighbors)
+			this.neighbors.add(i);
+	}
+	
 	public void setValue(int value) {
 		this.value = value;
 	}
