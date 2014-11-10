@@ -7,21 +7,25 @@ import java.util.List;
 public class Graph {
 	
 	private List<Node> nodes;
+	private boolean isInverse;
 	
 	public Graph() {
+		isInverse = false;
 		nodes = new ArrayList<Node>(); 
 	}
 	
 	/**
 	 * Cria um clone do grafo passado como parâmetro
 	 */
-	public Graph(Graph graph) {
+	public Graph(Graph graph, boolean isInverse) {
+		this.isInverse = isInverse;
 		this.nodes = new ArrayList<Node>();
 		for (Node n : graph.nodes)
 			nodes.add(new Node(n));
 	}
 	
 	public Graph(List<Node> nodes) {
+		isInverse = false;
 		this.nodes = new ArrayList<Node>(nodes);
 	}
 	
@@ -54,7 +58,9 @@ public class Graph {
 		if (!containsNode(value1) || !containsNode(value2))
 			return false;
 		
-		return getNode(value1).isNeighbor(value2);
+		boolean connects = getNode(value1).isNeighbor(value2);
+		
+		return isInverse ? !connects : connects;
 	}
 	
 	/**
@@ -65,7 +71,7 @@ public class Graph {
 	 * @return grafo G' complementar de G
 	 */
 	public Graph getComplement() {
-		Graph temp = new Graph(this);
+		Graph temp = new Graph(this, !isInverse);
 		
 		for (Node n : temp.nodes)
 			n.invertNeighbors(temp.nodes);
@@ -81,7 +87,7 @@ public class Graph {
 	 * @return C.I.
 	 */
 	public Graph getIndependentSet(int[] order) {
-		Graph temp = new Graph(this);
+		Graph temp = new Graph(this, isInverse);
 		
 		// Itera por todos os nós, removendo os vizinhos deles
 		for (int n : order)
@@ -95,7 +101,7 @@ public class Graph {
 		for (int i = 0; i < nodes.size(); i++)
 			array[i] = nodes.get(i).getValue();
 		
-		List<Graph> maxs = new ArrayList<Graph>();
+		final List<Graph> maxs = new ArrayList<Graph>();
 		
 		new Permutations() {
 			

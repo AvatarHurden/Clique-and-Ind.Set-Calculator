@@ -19,11 +19,12 @@ public class EdgeGUI extends JPanel implements GraphElement {
 	private Point lastLocation;
 	
 	private boolean isEnabled = true;
+	private boolean isDeleteHovered = false;
 	
 	public EdgeGUI(NodeGUI start, Graphics g) {
 		this.g = g;
 		this.start = start;
-		start.setHighlight(true);
+//		start.setHighlight(true);
 	}
 	
 	@Override
@@ -66,8 +67,7 @@ public class EdgeGUI extends JPanel implements GraphElement {
 	public void erase() {
 		if (end != null) {
 			setHovered(false);
-			setHighlight(false);
-			setSelected(false);
+			setDeleteHovered(false);
 		}
 		g.setColor(Color.WHITE);
 		
@@ -80,7 +80,7 @@ public class EdgeGUI extends JPanel implements GraphElement {
 			g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
 	
 		lastLocation = null;
-		start.setHighlight(false);
+//		start.setHighlight(false);
 	}
 	
 	/**
@@ -101,7 +101,7 @@ public class EdgeGUI extends JPanel implements GraphElement {
 		}
 		g.setColor(Color.BLACK);
 		g.drawLine(start.getX(), start.getY(), p.x, p.y);
-		start.setHighlight(true);
+//		start.setHighlight(true);
 		lastLocation = p;
 	}
 	
@@ -113,8 +113,12 @@ public class EdgeGUI extends JPanel implements GraphElement {
 	}
 	
 	@Override
-	public void setSelected(boolean isSelected) {
-		g.setColor(isSelected ? Color.RED : Color.WHITE);
+	public void setDeleteHovered(boolean isDeleteHovered) {
+		if (this.isDeleteHovered == isDeleteHovered)
+			return;
+		
+		this.isDeleteHovered = isDeleteHovered;
+		g.setColor(isDeleteHovered ? Color.RED : Color.WHITE);
 		((Graphics2D) g).setStroke(new BasicStroke(5));
 		g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
 		((Graphics2D) g).setStroke(new BasicStroke(1));
@@ -124,8 +128,8 @@ public class EdgeGUI extends JPanel implements GraphElement {
 	@Override
 	public void setHovered(boolean isHovered) {}
 
-	@Override
-	public void setHighlight(boolean hasHighlight) {}
+//	@Override
+//	public void setHighlight(boolean hasHighlight) {}
 	
 	@Override
 	public void paint() {

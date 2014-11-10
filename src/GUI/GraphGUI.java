@@ -146,13 +146,13 @@ public class GraphGUI {
 			drawGraph();
 	}
 	
-	public void setSelected(GraphElement elem, boolean isSelected) {
+	public void setDeleteHovered(GraphElement elem, boolean isSelected) {
 		if (elem != null)
-			elem.setSelected(isSelected);
+			elem.setDeleteHovered(isSelected);
 		if (elem instanceof NodeGUI)
 			for (EdgeGUI edge : edges)
 				if (edge.isEdgeOf((NodeGUI) elem))
-					edge.setSelected(isSelected);
+					edge.setDeleteHovered(isSelected);
 		drawGraph();
 	}
 	

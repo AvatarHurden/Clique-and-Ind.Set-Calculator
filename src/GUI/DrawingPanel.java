@@ -39,6 +39,8 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	private SwitchArrows arrow;
 	
+	private boolean isCalculating;
+	
 	public DrawingPanel() {
 
 		setPreferredSize(new Dimension(800, 600));
@@ -72,6 +74,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	public void setCalculating() {
+		isCalculating = true;
 		Graphics g = getGraphics();
 		
 		g.setColor(new Color(220, 220, 220));
@@ -86,6 +89,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	public void setSubGraphs(List<Graph> subGraphs) {
+		isCalculating = false;
 		this.subGraphs = subGraphs;
 		index = 0;
 		graph.setSubGraph(subGraphs.get(0));
@@ -96,6 +100,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	}
 	
 	public void removeSubGraphs() {
+		isCalculating = false;
 		this.subGraphs = null;
 		graph.enableAll();
 		arrow.setActive(false, getGraphics());
@@ -153,14 +158,13 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 		
 		if (hoveredElement != closest) {
 			if (toDelete)
-				graph.setSelected(hoveredElement, false);
+				graph.setDeleteHovered(hoveredElement, false);
 			graph.setHovered(hoveredElement, false);
 		}
 		
 		hoveredElement = closest;
 		
-		if (toDelete)
-			graph.setSelected(hoveredElement, toDelete);
+		graph.setDeleteHovered(hoveredElement, toDelete);
 		
 		if (state == DrawingState.MOVING && hoveredElement != null)
 			setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -246,6 +250,8 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
+		if (isCalculating)
+			return;
 		if (!arrow.isHovered(e.getPoint(), getGraphics()))
 			setHovered(e.getPoint(), state == DrawingState.DELETING);
 	}

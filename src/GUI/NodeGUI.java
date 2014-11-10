@@ -21,6 +21,8 @@ public class NodeGUI extends JPanel implements GraphElement {
 	private int x, y;
 	
 	private boolean isEnabled = true;
+	private boolean isHovered = false;
+	private boolean isDeleteHovered = false;
 	
 	public NodeGUI(int x, int y, Graphics g) {
 		this.g = g;
@@ -49,21 +51,33 @@ public class NodeGUI extends JPanel implements GraphElement {
 	}
 
 	@Override
-	public void setSelected(boolean isSelected) {
-		g.setColor(isSelected ? Color.RED : Color.WHITE);
+	public void setDeleteHovered(boolean isDeleteHovered) {
+		if (this.isDeleteHovered == isDeleteHovered)
+			return;
+		
+		this.isDeleteHovered = isDeleteHovered;
+		g.setColor(isDeleteHovered ? Color.RED : Color.WHITE);
 		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
-		//paint();
+		paint();
 	}
 	
-	@Override
-	public void setHighlight(boolean hasHighlight) {
-		g.setColor(hasHighlight ? (isEnabled? Color.BLUE : Color.LIGHT_GRAY) : Color.WHITE);
-		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
-		//paint();
-	}
+//	@Override
+//	public void setHighlight(boolean isHighlighted) {
+//		if (isHighlighted == isHighlighted)
+//			return;
+//		
+//		this.isHighlighted = isHighlighted;
+//		g.setColor(isHighlighted ? (isEnabled? Color.BLUE : Color.LIGHT_GRAY) : Color.WHITE);
+//		g.fillOval(x - RADIUS - 4, y - RADIUS - 4, 2*RADIUS + 8, 2*RADIUS + 8);
+//		paint();
+//	}
 
 	@Override
 	public void setHovered(boolean isHovered) {
+		if (this.isHovered == isHovered)
+			return;
+		
+		this.isHovered = isHovered;
 		g.setColor(isHovered ? (isEnabled? Color.DARK_GRAY : Color.LIGHT_GRAY) : Color.WHITE);
 		g.drawOval(x - AURA, y - AURA, 2*AURA, 2*AURA);
 	}
@@ -81,7 +95,8 @@ public class NodeGUI extends JPanel implements GraphElement {
 	@Override
 	public void erase() {
 		setHovered(false);
-		setHighlight(false);
+		setDeleteHovered(false);
+//		setHighlight(false);
 		g.setColor(Color.WHITE);
 		g.fillOval(x - RADIUS, y - RADIUS, 2*RADIUS, 2*RADIUS);
 	}

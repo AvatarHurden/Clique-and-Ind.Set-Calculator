@@ -22,13 +22,13 @@ public interface GraphElement {
 	 * em um nodo ou deslocar um nodo
 	 * @param isSelected
 	 */
-	public void setSelected(boolean isSelected);
+	public void setDeleteHovered(boolean isDeleteHovered);
 	
-	/**
-	 * Método chamado quando o usuário "hover" sobre o elemento no estado de deleção
-	 * @param hasHighlight
-	 */
-	public void setHighlight(boolean hasHighlight);
+//	/**
+//	 * Método chamado quando o usuário "hover" sobre o elemento no estado de deleção
+//	 * @param hasHighlight
+//	 */
+//	public void setHighlight(boolean hasHighlight);
 	
 	/**
 	 * Método chamado quando o usuário "hover" sobre o elemento no estado de criação
